@@ -1,0 +1,422 @@
+<div class="space-y-5">
+
+    <div class="flex items-center gap-2 sm:gap-3">
+        <button (click)="goBack()"
+            class="p-1.5 sm:p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition shrink-0">
+            <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+        </button>
+        <div class="min-w-0">
+            <h1 class="text-base sm:text-xl font-bold text-gray-900 truncate">تفاصيل العامل</h1>
+            <p class="text-xs sm:text-sm text-gray-500 mt-0.5 truncate">{{ worker?.name }}</p>
+        </div>
+    </div>
+
+    <div *ngIf="isLoading" class="flex items-center justify-center py-20">
+        <svg class="animate-spin h-7 w-7 text-indigo-600" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+        </svg>
+    </div>
+
+    <div *ngIf="errorMessage" class="bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg px-4 py-3">
+        {{ errorMessage }}
+    </div>
+
+    <div *ngIf="!isLoading && worker">
+
+        <!-- البيانات الأساسية -->
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-3 sm:p-6 mb-5">
+            <div class="flex items-center justify-between gap-2 mb-4">
+                <h2 class="font-semibold text-gray-900 text-sm sm:text-base">البيانات الأساسية</h2>
+                <a [routerLink]="['/workers', worker._id, 'edit']"
+                    class="flex items-center gap-1 sm:gap-1.5 text-xs sm:text-sm text-indigo-600 hover:text-indigo-700 font-medium shrink-0">
+                    <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15.232 5.232l3.536 3.536M9 11l6.5-6.5a2 2 0 112.828 2.828L11.828 13.828A2 2 0 0110 14H8v-2a2 2 0 01.586-1.414z" />
+                    </svg>
+                    تعديل
+                </a>
+            </div>
+
+            <div class="grid grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4">
+                <div class="bg-gray-50 rounded-lg p-2 sm:p-3 min-w-0">
+                    <p class="text-[10px] sm:text-xs text-gray-500 mb-1">الاسم</p>
+                    <p class="text-xs sm:text-sm font-medium text-gray-900 break-words">{{ worker.name }}</p>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-2 sm:p-3 min-w-0">
+                    <p class="text-[10px] sm:text-xs text-gray-500 mb-1">رقم الهوية</p>
+                    <p class="text-xs sm:text-sm font-medium text-gray-900 break-words">{{ worker.identity_number }}</p>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-2 sm:p-3 min-w-0">
+                    <p class="text-[10px] sm:text-xs text-gray-500 mb-1">رقم الصادر</p>
+                    <p class="text-xs sm:text-sm font-medium text-gray-900 break-words">{{ worker.source_number }}</p>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-2 sm:p-3 min-w-0">
+                    <p class="text-[10px] sm:text-xs text-gray-500 mb-1">الجنسية</p>
+                    <p class="text-xs sm:text-sm font-medium text-gray-900 break-words">{{ worker.nationality }}</p>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-2 sm:p-3 min-w-0">
+                    <p class="text-[10px] sm:text-xs text-gray-500 mb-1">المهنة</p>
+                    <p class="text-xs sm:text-sm font-medium text-gray-900 break-words">{{ worker.profession }}</p>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-2 sm:p-3 min-w-0">
+                    <p class="text-[10px] sm:text-xs text-gray-500 mb-1">الكفيل</p>
+                    <p class="text-xs sm:text-sm font-medium text-gray-900 break-words">{{ getEmployerName() }}</p>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-2 sm:p-3 min-w-0">
+                    <p class="text-[10px] sm:text-xs text-gray-500 mb-1">رقم الإقامة</p>
+                    <p class="text-xs sm:text-sm font-medium text-gray-900 break-words">{{ worker.iqama_number }}</p>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-2 sm:p-3 min-w-0">
+                    <p class="text-[10px] sm:text-xs text-gray-500 mb-1">تاريخ إصدار الإقامة</p>
+                    <p class="text-xs sm:text-sm font-medium text-gray-900 break-words">{{ worker.iqama_issue_date }}
+                    </p>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-2 sm:p-3 min-w-0">
+                    <p class="text-[10px] sm:text-xs text-gray-500 mb-1">تاريخ انتهاء الإقامة</p>
+                    <p class="text-xs sm:text-sm font-medium text-gray-900 break-words">{{ worker.iqama_expiry_date }}
+                    </p>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-2 sm:p-3 min-w-0">
+                    <p class="text-[10px] sm:text-xs text-gray-500 mb-1">حالة الإقامة</p>
+                    <p class="text-xs sm:text-sm font-medium text-gray-900 break-words">{{ worker.iqama_status }}</p>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-2 sm:p-3 min-w-0">
+                    <p class="text-[10px] sm:text-xs text-gray-500 mb-1">رقم الحساب</p>
+                    <p class="text-xs sm:text-sm font-medium text-gray-900 break-words">{{ worker.account_number }}</p>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-2 sm:p-3 min-w-0">
+                    <p class="text-[10px] sm:text-xs text-gray-500 mb-1">العنوان</p>
+                    <p class="text-xs sm:text-sm font-medium text-gray-900 break-words">{{ worker.address }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+
+            <div class="flex border-b border-gray-100 overflow-x-auto">
+                <button (click)="setTab('family_visas')" [class.text-indigo-600]="activeTab === 'family_visas'"
+                    [class.border-indigo-600]="activeTab === 'family_visas'"
+                    [class.border-transparent]="activeTab !== 'family_visas'"
+                    class="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-5 py-2.5 sm:py-3.5 text-xs sm:text-sm font-medium border-b-2 transition text-gray-500 hover:text-gray-700 whitespace-nowrap shrink-0">
+                    التأشيرات العائلية
+                </button>
+                <button (click)="setTab('alerts')" [class.text-indigo-600]="activeTab === 'alerts'"
+                    [class.border-indigo-600]="activeTab === 'alerts'"
+                    [class.border-transparent]="activeTab !== 'alerts'"
+                    class="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-5 py-2.5 sm:py-3.5 text-xs sm:text-sm font-medium border-b-2 transition text-gray-500 hover:text-gray-700 whitespace-nowrap shrink-0">
+                    البلاغات
+                </button>
+                <button (click)="setTab('profession_changes')"
+                    [class.text-indigo-600]="activeTab === 'profession_changes'"
+                    [class.border-indigo-600]="activeTab === 'profession_changes'"
+                    [class.border-transparent]="activeTab !== 'profession_changes'"
+                    class="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-5 py-2.5 sm:py-3.5 text-xs sm:text-sm font-medium border-b-2 transition text-gray-500 hover:text-gray-700 whitespace-nowrap shrink-0">
+                    تغيير المهنة
+                </button>
+                <button (click)="setTab('moamla_type')" [class.text-indigo-600]="activeTab === 'moamla_type'"
+                    [class.border-indigo-600]="activeTab === 'moamla_type'"
+                    [class.border-transparent]="activeTab !== 'moamla_type'"
+                    class="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-5 py-2.5 sm:py-3.5 text-xs sm:text-sm font-medium border-b-2 transition text-gray-500 hover:text-gray-700 whitespace-nowrap shrink-0">
+                    الأستعلام العام عم المعاملات
+                </button>
+            </div>
+
+            <!-- Tab: التأشيرات العائلية -->
+            <div *ngIf="activeTab === 'family_visas'" class="p-3 sm:p-5">
+                <div class="flex items-center justify-between gap-2 mb-4">
+                    <h3 class="font-medium text-gray-900 text-sm sm:text-base">التأشيرات العائلية</h3>
+                    <a [routerLink]="['/workers', worker._id, 'family-visas', 'add']"
+                        class="flex items-center gap-1 sm:gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-medium px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg transition shrink-0 whitespace-nowrap">
+                        <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                        إضافة تأشيرة
+                    </a>
+                </div>
+
+                <div *ngIf="familyVisasErrorMessage"
+                    class="bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg px-4 py-3 mb-4">
+                    {{ familyVisasErrorMessage }}
+                </div>
+
+                <div *ngIf="isLoadingFamilyVisas" class="flex items-center justify-center py-16">
+                    <svg class="animate-spin h-7 w-7 text-indigo-600" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
+                        </circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                    </svg>
+                </div>
+
+                <div *ngIf="!isLoadingFamilyVisas && familyVisas.length === 0" class="text-center py-12 text-gray-400">
+                    <p class="text-sm">لا يوجد تأشيرات عائلية مسجلة</p>
+                </div>
+
+                <div *ngIf="!isLoadingFamilyVisas && familyVisas.length > 0" class="space-y-3">
+                    <div *ngFor="let visa of familyVisas" class="bg-gray-50 rounded-lg p-3 sm:p-4">
+                        <div class="flex items-center justify-between gap-2 mb-3">
+                            <h4 class="font-medium text-gray-900 text-sm sm:text-base min-w-0 truncate">{{
+                                visa.visitor_name }}</h4>
+                            <div class="flex items-center gap-1 sm:gap-2 shrink-0">
+                                <a [routerLink]="['/family-visas', visa._id, 'edit']"
+                                    class="p-1 sm:p-1.5 text-gray-500 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition"
+                                    title="تعديل">
+                                    <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24"
+                                        stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15.232 5.232l3.536 3.536M9 11l6.5-6.5a2 2 0 112.828 2.828L11.828 13.828A2 2 0 0110 14H8v-2a2 2 0 01.586-1.414z" />
+                                    </svg>
+                                </a>
+                                <button (click)="deleteFamilyVisa(visa._id)" [disabled]="isDeletingVisa === visa._id"
+                                    class="p-1 sm:p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition disabled:opacity-50"
+                                    title="حذف">
+                                    <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24"
+                                        stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+                            <div class="min-w-0">
+                                <p class="text-[10px] sm:text-xs text-gray-500 mb-1">صلة القرابة</p>
+                                <p class="text-xs sm:text-sm font-medium text-gray-900 break-words">{{ visa.relation }}
+                                </p>
+                            </div>
+                            <div class="min-w-0">
+                                <p class="text-[10px] sm:text-xs text-gray-500 mb-1">الجنسية</p>
+                                <p class="text-xs sm:text-sm font-medium text-gray-900 break-words">{{ visa.nationality
+                                    }}</p>
+                            </div>
+                            <div class="min-w-0">
+                                <p class="text-[10px] sm:text-xs text-gray-500 mb-1">السن</p>
+                                <p class="text-xs sm:text-sm font-medium text-gray-900 break-words">{{ visa.age
+                                    }}</p>
+                            </div>
+
+                            <div class="min-w-0">
+                                <p class="text-[10px] sm:text-xs text-gray-500 mb-1">الغرض</p>
+                                <p class="text-xs sm:text-sm font-medium text-gray-900 break-words">{{
+                                    getPurposeLabel(visa.purpose) }}</p>
+                            </div>
+                            <div class="min-w-0">
+                                <p class="text-[10px] sm:text-xs text-gray-500 mb-1">رقم الصادر</p>
+                                <p class="text-xs sm:text-sm font-medium text-gray-900 break-words">{{
+                                    visa.source_number
+                                    }}</p>
+                            </div>
+                            <div class="min-w-0">
+                                <p class="text-[10px] sm:text-xs text-gray-500 mb-1">مدة الإقامة</p>
+                                <p class="text-xs sm:text-sm font-medium text-gray-900">{{ visa.duration_days }} يوم</p>
+                            </div>
+                            <div class="min-w-0">
+                                <p class="text-[10px] sm:text-xs text-gray-500 mb-1">تاريخ الإصدار</p>
+                                <p class="text-xs sm:text-sm font-medium text-gray-900 break-words">{{ visa.releaseDate
+                                    }}</p>
+                            </div>
+                            <div *ngIf="visa.status" class="min-w-0">
+                                <p class="text-[10px] sm:text-xs text-gray-500 mb-1">الحالة</p>
+                                <p class="text-xs sm:text-sm font-medium text-gray-900 break-words">{{
+                                    getStatusLablel(visa.status) }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: البلاغات -->
+            <div *ngIf="activeTab === 'alerts'" class="p-3 sm:p-5">
+
+                <div *ngIf="!worker.alerts?.type" class="text-center py-10 text-gray-400">
+                    <p class="text-sm mb-4">لا يوجد بلاغ مسجل</p>
+                    <a [routerLink]="['/workers', worker._id, 'alerts', 'add']"
+                        class="inline-flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                        إضافة بلاغ
+                    </a>
+                </div>
+
+                <div *ngIf="worker.alerts?.type">
+                    <div class="flex items-center justify-between gap-2 mb-4">
+                        <h3 class="font-medium text-gray-900 text-sm sm:text-base">بيانات البلاغ</h3>
+                        <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+                            <a [routerLink]="['/workers', worker._id, 'alerts', 'edit']"
+                                class="text-xs sm:text-sm text-indigo-600 hover:text-indigo-700 font-medium">تعديل</a>
+                            <button (click)="deleteAlert()" [disabled]="isDeletingAlert"
+                                class="text-xs sm:text-sm text-red-600 hover:text-red-700 font-medium disabled:opacity-50">حذف</button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2 sm:gap-4">
+                        <div class="bg-gray-50 rounded-lg p-2 sm:p-3 min-w-0">
+                            <p class="text-[10px] sm:text-xs text-gray-500 mb-1">نوع البلاغ</p>
+                            <p class="text-xs sm:text-sm font-medium text-gray-900 break-words">{{ worker.alerts!.type
+                                }}</p>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-2 sm:p-3 min-w-0">
+                            <p class="text-[10px] sm:text-xs text-gray-500 mb-1">الحالة</p>
+                            <span
+                                class="inline-block text-[10px] sm:text-xs font-medium px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full"
+                                [ngClass]="getAlertStatusClass(worker.alerts!.status)">
+                                {{ getAlertStatusLabel(worker.alerts!.status) }}
+                            </span>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-2 sm:p-3 min-w-0">
+                            <p class="text-[10px] sm:text-xs text-gray-500 mb-1">تاريخ التقديم</p>
+                            <p class="text-xs sm:text-sm font-medium text-gray-900 break-words">{{
+                                worker.alerts!.filed_date }}</p>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-2 sm:p-3 min-w-0">
+                            <p class="text-[10px] sm:text-xs text-gray-500 mb-1">تاريخ الحل</p>
+                            <p class="text-xs sm:text-sm font-medium text-gray-900 break-words">{{
+                                worker.alerts!.resolved_date || '-' }}</p>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-2 sm:p-3 min-w-0">
+                            <p class="text-[10px] sm:text-xs text-gray-500 mb-1">رقم الصادر</p>
+                            <p class="text-xs sm:text-sm font-medium text-gray-900 break-words">{{
+                                worker.alerts!.source_number || '-' }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: تغيير المهنة -->
+            <div *ngIf="activeTab === 'profession_changes'" class="p-3 sm:p-5">
+
+                <div *ngIf="!worker.profession_changes?.change_date" class="text-center py-10 text-gray-400">
+                    <p class="text-sm mb-4">لا يوجد تغيير مهنة مسجل</p>
+                    <a [routerLink]="['/workers', worker._id, 'profession-change', 'add']"
+                        class="inline-flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                        تسجيل تغيير مهنة
+                    </a>
+                </div>
+
+                <div *ngIf="worker.profession_changes?.change_date">
+                    <div class="flex items-center justify-between gap-2 mb-4">
+                        <h3 class="font-medium text-gray-900 text-sm sm:text-base">آخر تغيير مهنة</h3>
+                        <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+                            <a [routerLink]="['/workers', worker._id, 'profession-change', 'edit']"
+                                class="text-xs sm:text-sm text-indigo-600 hover:text-indigo-700 font-medium">تعديل</a>
+                            <button (click)="deleteProfessionChange()" [disabled]="isDeletingProfessionChange"
+                                class="text-xs sm:text-sm text-red-600 hover:text-red-700 font-medium disabled:opacity-50">حذف</button>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4">
+                        <div class="bg-gray-50 rounded-lg p-2 sm:p-3 min-w-0">
+                            <p class="text-[10px] sm:text-xs text-gray-500 mb-1">المهنة القديمة</p>
+                            <p class="text-xs sm:text-sm font-medium text-gray-900 break-words">{{
+                                worker.profession_changes!.old_profession }}
+                            </p>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-2 sm:p-3 min-w-0">
+                            <p class="text-[10px] sm:text-xs text-gray-500 mb-1">المهنة الحالية</p>
+                            <p class="text-xs sm:text-sm font-medium text-gray-900 break-words">{{ worker.profession }}
+                            </p>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-2 sm:p-3 min-w-0">
+                            <p class="text-[10px] sm:text-xs text-gray-500 mb-1">الحالة</p>
+                            <span
+                                class="inline-block text-[10px] sm:text-xs font-medium px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full"
+                                [ngClass]="getAlertStatusClass(worker.profession_changes!.status)">
+                                {{ getAlertStatusLabel(worker.profession_changes!.status) }}
+                            </span>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-2 sm:p-3 min-w-0">
+                            <p class="text-[10px] sm:text-xs text-gray-500 mb-1">تاريخ التغيير</p>
+                            <p class="text-xs sm:text-sm font-medium text-gray-900 break-words">{{
+                                worker.profession_changes!.change_date }}
+                            </p>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-2 sm:p-3 min-w-0">
+                            <p class="text-[10px] sm:text-xs text-gray-500 mb-1">رقم الصادر</p>
+                            <p class="text-xs sm:text-sm font-medium text-gray-900 break-words">{{
+                                worker.profession_changes!.source_number }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: أنواع المعاملات -->
+            <div *ngIf="activeTab === 'moamla_type'" class="p-3 sm:p-5">
+                <div class="flex items-center justify-between gap-2 mb-4">
+                    <h3 class="font-medium text-gray-900 text-sm sm:text-base">الأستعلام العام عن المعاملات</h3>
+                    <a [routerLink]="['/workers', worker._id, 'moamla-type', 'add']"
+                        class="flex items-center gap-1 sm:gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-medium px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg transition shrink-0 whitespace-nowrap">
+                        <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                        إضافة نوع معاملة
+                    </a>
+                </div>
+
+                <div *ngIf="moamlaTypesErrorMessage"
+                    class="bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg px-4 py-3 mb-4">
+                    {{ moamlaTypesErrorMessage }}
+                </div>
+
+                <div *ngIf="!worker.moamla_type || worker.moamla_type.length === 0"
+                    class="text-center py-12 text-gray-400">
+                    <p class="text-sm">لا يوجد أنواع معاملات مسجلة</p>
+                </div>
+
+                <div *ngIf="worker.moamla_type && worker.moamla_type.length > 0" class="space-y-3">
+                    <div *ngFor="let moamla of worker.moamla_type" class="bg-gray-50 rounded-lg p-3 sm:p-4">
+                        <div class="flex items-center justify-between gap-2">
+                            <div class="min-w-0">
+                                <p class="text-[10px] sm:text-xs text-gray-500 mb-1">نوع المعاملة</p>
+                                <p class="text-xs sm:text-sm font-medium text-gray-900 break-words">{{ moamla.name }}
+                                </p>
+                            </div>
+                            <div class="min-w-0">
+                                <p class="text-[10px] sm:text-xs text-gray-500 mb-1">رقم الصادر</p>
+                                <p class="text-xs sm:text-sm font-medium text-gray-900 break-words">{{
+                                    moamla.source_number }}
+                                </p>
+                            </div>
+                            <div class="flex items-center gap-1.5 sm:gap-3 shrink-0">
+                                <span
+                                    class="inline-block text-[10px] sm:text-xs font-medium px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full whitespace-nowrap"
+                                    [ngClass]="getAlertStatusClass(moamla.status)">
+                                    {{ getAlertStatusLabel(moamla.status) }}
+                                </span>
+                                <a [routerLink]="['/workers', worker._id, 'moamla-type', moamla._id, 'edit']"
+                                    class="p-1 sm:p-1.5 text-gray-500 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition"
+                                    title="تعديل">
+                                    <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24"
+                                        stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15.232 5.232l3.536 3.536M9 11l6.5-6.5a2 2 0 112.828 2.828L11.828 13.828A2 2 0 0110 14H8v-2a2 2 0 01.586-1.414z" />
+                                    </svg>
+                                </a>
+                                <button (click)="deleteMoamlaType(moamla._id)"
+                                    [disabled]="isDeletingMoamlaType === moamla._id"
+                                    class="p-1 sm:p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition disabled:opacity-50"
+                                    title="حذف">
+                                    <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24"
+                                        stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

@@ -1,0 +1,36 @@
+<!-- Overlay للموبايل -->
+@if (isOpen) {
+<div class="fixed inset-0 bg-black/40 z-30 lg:hidden" (click)="closeSidebar.emit()"></div>
+}
+
+<aside
+    class="w-64 h-screen bg-white border-l border-gray-200 flex flex-col fixed top-0 z-40 transition-transform duration-300"
+    [class.right-0]="true" [class.translate-x-full]="!isOpen" [class.lg:translate-x-0]="true">
+    <!-- Logo -->
+    <div class="h-16 flex items-center justify-center border-b border-gray-100 px-4">
+        <div class="flex items-center gap-2">
+            <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
+                <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5" />
+                </svg>
+            </div>
+            <span class="font-bold text-gray-900">لوحة التحكم</span>
+        </div>
+    </div>
+
+    <!-- Links -->
+    <nav class="flex-1 px-3 py-1 space-y-1 overflow-y-auto">
+
+        <a *ngFor="let link of links" [routerLink]="link.path" routerLinkActive="bg-indigo-50 text-indigo-600"
+            [routerLinkActiveOptions]="{ exact: true }" (click)="onLinkClick()"
+            class="flex items-center gap-3 px-3 py-1 rounded-lg text-gray-600 hover:bg-gray-50 transition text-sm font-medium">
+            {{ link.label }}
+        </a>
+    </nav>
+
+    <!-- Footer -->
+    <div class="p-3 border-t border-gray-100">
+        <p class="text-xs text-gray-400 text-center">جميع الحقوق محفوظة © 2026</p>
+    </div>
+</aside>

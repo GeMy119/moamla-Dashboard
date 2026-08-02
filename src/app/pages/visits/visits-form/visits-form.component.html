@@ -1,0 +1,132 @@
+<div class="space-y-5">
+
+    <div class="flex items-center gap-3">
+        <button (click)="goBack()"
+            class="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+        </button>
+        <h1 class="text-xl font-bold text-gray-900">
+            {{ isEditMode ? 'تعديل تأشيرة زيارة' : 'إضافة تأشيرة زيارة' }}
+        </h1>
+    </div>
+
+    <div *ngIf="errorMessage" class="bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg px-4 py-3">
+        {{ errorMessage }}
+    </div>
+
+    <div *ngIf="isFetching" class="flex items-center justify-center py-20">
+        <svg class="animate-spin h-7 w-7 text-indigo-600" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+        </svg>
+    </div>
+
+    <form *ngIf="!isFetching" (ngSubmit)="onSubmit()"
+        class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 space-y-5">
+
+        <!-- رفع الصورة -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">صورة التأشيرة</label>
+            <div class="flex items-center gap-4">
+                <img *ngIf="imagePreviewUrl" [src]="imagePreviewUrl"
+                    class="w-20 h-20 rounded-lg object-cover border border-gray-200" />
+                <input type="file" accept="image/*" (change)="onImageSelected($event)" class="text-sm text-gray-600 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0
+                    file:bg-indigo-50 file:text-indigo-600 file:text-sm file:font-medium hover:file:bg-indigo-100" />
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1.5">رقم التأشيرة</label>
+                <input type="text" name="visaNo" [(ngModel)]="formData.visaNo" required
+                    class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1.5">رقم جواز السفر</label>
+                <input type="text" name="passportNo" [(ngModel)]="formData.passportNo" required
+                    class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1.5">رقم السجل</label>
+                <input type="text" name="code" [(ngModel)]="formData.code" required
+                    class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1.5">رقم الطلب</label>
+                <input type="text" name="applicationNo" [(ngModel)]="formData.applicationNo" required
+                    class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1.5">الاسم</label>
+                <input type="text" name="name" [(ngModel)]="formData.name" required
+                    class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1.5">تاريخ الميلاد</label>
+                <input type="string" name="birthDate" [(ngModel)]="formData.birthDate" required
+                    class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1.5">الجنسية</label>
+                <input type="text" name="nationality" [(ngModel)]="formData.nationality" required
+                    class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1.5">صالحة اعتبارًا من</label>
+                <input type="string" name="validFrom" [(ngModel)]="formData.validFrom" required
+                    class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1.5">صالحة لغاية</label>
+                <input type="string" name="validUntil" [(ngModel)]="formData.validUntil" required
+                    class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1.5">نوع التأشيرة</label>
+                <input type="text" name="typeOfVisa" [(ngModel)]="formData.typeOfVisa" required
+                    class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1.5">مدة الإقامة</label>
+                <input type="text" name="durationOfStay" [(ngModel)]="formData.durationOfStay" required
+                    class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1.5">مصدر التأشيرة</label>
+                <input type="text" name="placeOfIssue" [(ngModel)]="formData.placeOfIssue" required
+                    class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1.5">عدد مرات الدخول</label>
+                <input type="text" name="entryType" [(ngModel)]="formData.entryType" required
+                    class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            </div>
+        </div>
+
+        <div class="flex items-center gap-3 pt-2">
+            <button type="submit" [disabled]="isLoading"
+                class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-5 py-2.5 rounded-lg transition disabled:opacity-50">
+                {{ isLoading ? 'جارِ الحفظ...' : 'حفظ' }}
+            </button>
+            <button type="button" (click)="goBack()"
+                class="text-gray-600 text-sm font-medium px-5 py-2.5 rounded-lg hover:bg-gray-50 transition">
+                إلغاء
+            </button>
+        </div>
+    </form>
+</div>

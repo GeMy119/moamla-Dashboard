@@ -1,0 +1,78 @@
+<div class="space-y-6">
+
+    <!-- Page Title -->
+    <div>
+        <h1 class="text-xl font-bold text-gray-900">نظرة عامة</h1>
+        <p class="text-gray-500 text-sm mt-1">ملخص سريع لإحصائيات النظام</p>
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="errorMessage" class="bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg px-4 py-3">
+        {{ errorMessage }}
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+
+        <div class="bg-white rounded-xl border border-gray-100 p-5 shadow-sm flex items-center justify-between">
+            <div>
+                <p class="text-gray-500 text-sm">عدد الكفلاء</p>
+                <p class="text-2xl font-bold text-gray-900 mt-1">
+                    {{ isLoading ? '--' : stats.employers }}
+                </p>
+            </div>
+            <div class="w-11 h-11 bg-indigo-50 rounded-lg flex items-center justify-center">
+                <svg class="w-5 h-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m6-5.13a4 4 0 11-8 0 4 4 0 018 0zm6 3a4 4 0 10-8 0" />
+                </svg>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl border border-gray-100 p-5 shadow-sm flex items-center justify-between">
+            <div>
+                <p class="text-gray-500 text-sm">عدد العمال</p>
+                <p class="text-2xl font-bold text-gray-900 mt-1">
+                    {{ isLoading ? '--' : stats.workers }}
+                </p>
+            </div>
+            <div class="w-11 h-11 bg-green-50 rounded-lg flex items-center justify-center">
+                <svg class="w-5 h-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl border border-gray-100 p-5 shadow-sm flex items-center justify-between">
+            <div>
+                <p class="text-gray-500 text-sm">عدد التأشيرات</p>
+                <p class="text-2xl font-bold text-gray-900 mt-1">
+                    {{ isLoading ? '--' : stats.visits }}
+                </p>
+            </div>
+            <div class="w-11 h-11 bg-amber-50 rounded-lg flex items-center justify-center">
+                <svg class="w-5 h-5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl border border-gray-100 p-5 shadow-sm flex items-center justify-between">
+            <div>
+                <p class="text-gray-500 text-sm">طلبات الجنسية</p>
+                <p class="text-2xl font-bold text-gray-900 mt-1">
+                    {{ isLoading ? '--' : stats.nationalityRequests }}
+                </p>
+            </div>
+            <div class="w-11 h-11 bg-rose-50 rounded-lg flex items-center justify-center">
+                <svg class="w-5 h-5 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" />
+                </svg>
+            </div>
+        </div>
+
+    </div>
+</div>

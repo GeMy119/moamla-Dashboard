@@ -1,0 +1,198 @@
+<div class="space-y-5">
+
+    <div class="flex items-center justify-between gap-2">
+        <div class="min-w-0">
+            <h1 class="text-base sm:text-xl font-bold text-gray-900 truncate">طلبات الجنسية</h1>
+            <p class="text-xs sm:text-sm text-gray-500 mt-0.5">إجمالي {{ pagination.total }} طلب</p>
+        </div>
+
+        <a [routerLink]="['/nationality-requests', 'add']"
+            class="flex items-center gap-1 sm:gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-medium px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg transition shrink-0 whitespace-nowrap">
+            <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            إضافة طلب
+        </a>
+    </div>
+
+    <!-- Filters: عمودي على الموبايل / صف واحد على الشاشات الكبيرة -->
+    <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-3 sm:p-4">
+        <div class="flex flex-col sm:flex-row gap-2 sm:gap-3">
+            <select [(ngModel)]="filters.status"
+                class="w-full sm:flex-1 min-w-0 box-border border border-gray-200 rounded-lg px-3 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <option value="">كل الحالات</option>
+                <option value="تمت الموافقة">تمت الموافقة</option>
+                <option value="تم الرفض">تم الرفض</option>
+            </select>
+            <input type="text" [(ngModel)]="filters.job" placeholder="المهنة" (keyup.enter)="applyFilters()"
+                class="w-full sm:flex-1 min-w-0 box-border border border-gray-200 rounded-lg px-3 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            <button (click)="applyFilters()"
+                class="w-full sm:w-auto sm:shrink-0 box-border bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-medium px-4 py-2 rounded-lg transition whitespace-nowrap">
+                بحث
+            </button>
+        </div>
+    </div>
+
+    <div *ngIf="errorMessage" class="bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg px-4 py-3">
+        {{ errorMessage }}
+    </div>
+
+    <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+
+        <div *ngIf="isLoading" class="flex items-center justify-center py-20">
+            <svg class="animate-spin h-7 w-7 text-indigo-600" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+            </svg>
+        </div>
+
+        <!-- لا يوجد طلبات -->
+        <div *ngIf="!isLoading && requests.length === 0" class="text-center py-16 text-gray-400">
+            <p class="text-sm">لا يوجد طلبات مسجلة</p>
+        </div>
+
+        <!-- ✅ الجدول: يظهر بس من sm لفوق، مختفي تمامًا على الموبايل -->
+        <div *ngIf="!isLoading && requests.length > 0" class="hidden sm:block overflow-x-auto">
+            <table class="w-full text-sm text-right">
+                <thead class="bg-gray-50 border-b border-gray-100 text-gray-500 font-medium">
+                    <tr>
+                        <th class="px-4 py-3">الصورة</th>
+                        <th class="px-4 py-3">الاسم</th>
+                        <th class="px-4 py-3">رقم الهوية</th>
+                        <th class="px-4 py-3">رقم الصادر</th>
+                        <th class="px-4 py-3">رقم المعاملة</th>
+                        <th class="px-4 py-3">الرقم التسلسلي</th>
+                        <th class="px-4 py-3">المهنة</th>
+                        <th class="px-4 py-3">تاريخ الإصدار</th>
+                        <th class="px-4 py-3">الحالة</th>
+                        <th class="px-4 py-3">الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-50">
+                    <tr *ngFor="let request of requests" class="hover:bg-gray-50 transition">
+                        <td class="px-4 py-3">
+                            <img [src]="request.image_URL"
+                                class="w-10 h-10 rounded-lg object-cover border border-gray-100" />
+                        </td>
+                        <td class="px-4 py-3 font-medium text-gray-900">{{ request.name }}</td>
+                        <td class="px-4 py-3  text-gray-600">{{ request.identity_number }}</td>
+                        <td class="px-4 py-3 text-gray-600">{{ request.source_number }}</td>
+                        <td class="px-4 py-3 text-gray-600">{{ request.application_number }}</td>
+                        <td class="px-4 py-3 text-gray-600">{{ request.serial_number }}</td>
+                        <td class="px-4 py-3 text-gray-600">{{ request.job }}</td>
+                        <td class="px-4 py-3 text-gray-600">{{ request.issue_date }}</td>
+                        <td class="px-4 py-3">
+                            <span class="inline-block text-xs font-medium px-2.5 py-1 rounded-full"
+                                [ngClass]="getStatusClass(request.status)">
+                                {{ request.status }}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3">
+                            <div class="flex items-center gap-2">
+                                <a [routerLink]="['/nationality-requests', request._id, 'edit']"
+                                    class="p-1.5 text-gray-500 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition"
+                                    title="تعديل">
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15.232 5.232l3.536 3.536M9 11l6.5-6.5a2 2 0 112.828 2.828L11.828 13.828A2 2 0 0110 14H8v-2a2 2 0 01.586-1.414z" />
+                                    </svg>
+                                </a>
+                                <button (click)="deleteRequest(request._id)" [disabled]="isDeleting === request._id"
+                                    class="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition disabled:opacity-50"
+                                    title="حذف">
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ✅ الكروت: تظهر بس على الموبايل، تحت sm -->
+        <div *ngIf="!isLoading && requests.length > 0" class="sm:hidden divide-y divide-gray-50">
+            <div *ngFor="let request of requests" class="p-3">
+                <div class="flex items-start gap-3 mb-3">
+                    <img [src]="request.image_URL"
+                        class="w-12 h-12 rounded-lg object-cover border border-gray-100 shrink-0" />
+                    <div class="min-w-0 flex-1">
+                        <div class="flex items-center justify-between gap-2">
+                            <p class="font-medium text-gray-900 text-sm truncate">{{ request.name }}</p>
+                            <span
+                                class="inline-block text-[10px] font-medium px-2 py-0.5 rounded-full whitespace-nowrap shrink-0"
+                                [ngClass]="getStatusClass(request.status)">
+                                {{ request.status }}
+                            </span>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-0.5 truncate">{{ request.job }}</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 mb-3">
+                    <div class="min-w-0">
+                        <p class="text-[10px] text-gray-500 mb-0.5">رقم الهوية</p>
+                        <p class="text-xs font-medium text-gray-900 break-words">{{ request.identity_number }}</p>
+                    </div>
+                    <div class="min-w-0">
+                        <p class="text-[10px] text-gray-500 mb-0.5">رقم الصادر</p>
+                        <p class="text-xs font-medium text-gray-900 break-words">{{ request.source_number }}</p>
+                    </div>
+                    <div class="min-w-0">
+                        <p class="text-[10px] text-gray-500 mb-0.5">رقم المعاملة</p>
+                        <p class="text-xs font-medium text-gray-900 break-words">{{ request.application_number }}</p>
+                    </div>
+                    <div class="min-w-0">
+                        <p class="text-[10px] text-gray-500 mb-0.5">الرقم التسلسلي</p>
+                        <p class="text-xs font-medium text-gray-900 break-words">{{ request.serial_number }}</p>
+                    </div>
+                    <div class="min-w-0 col-span-2">
+                        <p class="text-[10px] text-gray-500 mb-0.5">تاريخ الإصدار</p>
+                        <p class="text-xs font-medium text-gray-900 break-words">{{ request.issue_date }}</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2 pt-2 border-t border-gray-100">
+                    <a [routerLink]="['/nationality-requests', request._id, 'edit']"
+                        class="flex-1 flex items-center justify-center gap-1 p-1.5 text-xs text-gray-600 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition">
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15.232 5.232l3.536 3.536M9 11l6.5-6.5a2 2 0 112.828 2.828L11.828 13.828A2 2 0 0110 14H8v-2a2 2 0 01.586-1.414z" />
+                        </svg>
+                        تعديل
+                    </a>
+                    <button (click)="deleteRequest(request._id)" [disabled]="isDeleting === request._id"
+                        class="flex-1 flex items-center justify-center gap-1 p-1.5 text-xs text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition disabled:opacity-50">
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                        حذف
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div *ngIf="!isLoading && pagination.pages > 1"
+            class="flex flex-col sm:flex-row items-center justify-between gap-2 px-3 sm:px-4 py-3 border-t border-gray-100">
+            <p class="text-xs sm:text-sm text-gray-500">صفحة {{ pagination.page }} من {{ pagination.pages }}</p>
+            <div class="flex items-center gap-1 flex-wrap justify-center">
+                <button (click)="goToPage(pagination.page - 1)" [disabled]="pagination.page === 1"
+                    class="px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 transition">
+                    السابق
+                </button>
+                <button *ngFor="let p of getPagesArray()" (click)="goToPage(p)"
+                    [class.bg-indigo-600]="p === pagination.page" [class.text-white]="p === pagination.page"
+                    class="px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition">
+                    {{ p }}
+                </button>
+                <button (click)="goToPage(pagination.page + 1)" [disabled]="pagination.page === pagination.pages"
+                    class="px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 transition">
+                    التالي
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

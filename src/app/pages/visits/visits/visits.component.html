@@ -1,0 +1,191 @@
+<div class="space-y-4">
+
+    <div class="flex items-center justify-between gap-2">
+        <div class="min-w-0">
+            <h1 class="text-base sm:text-lg font-bold text-gray-900 truncate">تأشيرات الزيارة</h1>
+            <p class="text-xs text-gray-500 mt-0.5">إجمالي {{ pagination.total }} تأشيرة</p>
+        </div>
+
+        <a [routerLink]="['/visits', 'add']"
+            class="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium px-2.5 sm:px-3 py-1.5 rounded-md transition shrink-0 whitespace-nowrap">
+            <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            إضافة تأشيرة
+        </a>
+    </div>
+
+    <!-- Filters: عمودي على الموبايل / صف واحد على الشاشات الكبيرة -->
+    <div class="bg-white rounded-lg border border-gray-100 shadow-sm p-3">
+        <div class="flex flex-col sm:flex-row gap-2">
+            <input type="text" [(ngModel)]="filters.nationality" placeholder="الجنسية" (keyup.enter)="applyFilters()"
+                class="w-full sm:flex-1 min-w-0 box-border border border-gray-200 rounded-md px-2.5 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500" />
+            <input type="text" [(ngModel)]="filters.typeOfVisa" placeholder="نوع التأشيرة"
+                (keyup.enter)="applyFilters()"
+                class="w-full sm:flex-1 min-w-0 box-border border border-gray-200 rounded-md px-2.5 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500" />
+            <button (click)="applyFilters()"
+                class="w-full sm:w-auto sm:shrink-0 box-border bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium px-3 py-1.5 rounded-md transition whitespace-nowrap">
+                بحث
+            </button>
+        </div>
+    </div>
+
+    <div *ngIf="errorMessage" class="bg-red-50 border border-red-200 text-red-600 text-xs rounded-md px-3 py-2">
+        {{ errorMessage }}
+    </div>
+
+    <div class="bg-white rounded-lg border border-gray-100 shadow-sm overflow-hidden">
+
+        <div *ngIf="isLoading" class="flex items-center justify-center py-12">
+            <svg class="animate-spin h-6 w-6 text-indigo-600" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+            </svg>
+        </div>
+
+        <!-- لا يوجد تأشيرات -->
+        <div *ngIf="!isLoading && visits.length === 0" class="text-center py-10 text-gray-400 text-xs">
+            لا يوجد تأشيرات مسجلة
+        </div>
+
+        <!-- ✅ الجدول: يظهر بس من sm لفوق -->
+        <div *ngIf="!isLoading && visits.length > 0" class="hidden sm:block overflow-x-auto">
+            <table class="w-full text-[11px] text-right border-collapse">
+                <thead class="bg-gray-50 border-b border-gray-100 text-gray-500 font-bold uppercase whitespace-nowrap">
+                    <tr>
+                        <th class="px-2 py-1.5">الصورة</th>
+                        <th class="px-2 py-1.5">الاسم</th>
+                        <th class="px-2 py-1.5">رقم التأشيرة</th>
+                        <th class="px-2 py-1.5">رقم الصادر</th>
+                        <th class="px-2 py-1.5">رقم الجواز</th>
+                        <th class="px-2 py-1.5">الجنسية</th>
+                        <th class="px-2 py-1.5">نوع التأشيرة</th>
+                        <th class="px-2 py-1.5">صالحة حتى</th>
+                        <th class="px-2 py-1.5">آخر عملية بحث</th>
+                        <th class="px-2 py-1.5 text-center">الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    <tr *ngFor="let visit of visits" class="hover:bg-gray-50/80 transition">
+                        <td class="px-2 py-1">
+                            <img [src]="visit.image_url"
+                                class="w-7 h-7 rounded-md object-cover border border-gray-100" />
+                        </td>
+                        <td class="px-2 py-1 font-medium text-gray-900 whitespace-nowrap">{{ visit.name }}</td>
+                        <td class="px-2 py-1 text-gray-600 font-mono whitespace-nowrap">{{ visit.visaNo }}</td>
+                        <td class="px-2 py-1 text-gray-600 font-mono whitespace-nowrap">{{ visit.source_number }}</td>
+                        <td class="px-2 py-1 text-gray-600 font-mono whitespace-nowrap">{{ visit.passportNo }}</td>
+                        <td class="px-2 py-1 text-gray-600 whitespace-nowrap">{{ visit.nationality }}</td>
+                        <td class="px-2 py-1 text-gray-600 whitespace-nowrap">{{ visit.typeOfVisa }}</td>
+                        <td class="px-2 py-1 text-gray-600 whitespace-nowrap font-mono">{{ visit.validUntil }}</td>
+                        <td class="px-2 py-1 text-gray-600 whitespace-nowrap font-mono">
+                            {{ visit.lastSearchedAt ? (visit.lastSearchedAt | date:'dd/MM/yyyy hh:mm a') : '—' }}
+                        </td>
+                        <td class="px-2 py-1">
+                            <div class="flex items-center justify-center gap-0.5">
+                                <a [routerLink]="['/visits', visit._id, 'edit']"
+                                    class="p-0.5 text-gray-500 hover:text-amber-600 hover:bg-amber-50 rounded transition"
+                                    title="تعديل">
+                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15.232 5.232l3.536 3.536M9 11l6.5-6.5a2 2 0 112.828 2.828L11.828 13.828A2 2 0 0110 14H8v-2a2 2 0 01.586-1.414z" />
+                                    </svg>
+                                </a>
+                                <button (click)="deleteVisit(visit._id)" [disabled]="isDeleting === visit._id"
+                                    class="p-0.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded transition disabled:opacity-50"
+                                    title="حذف">
+                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ✅ الكروت: تظهر بس على الموبايل، تحت sm -->
+        <div *ngIf="!isLoading && visits.length > 0" class="sm:hidden divide-y divide-gray-100">
+            <div *ngFor="let visit of visits" class="p-3">
+                <div class="flex items-start gap-2.5 mb-2.5">
+                    <img [src]="visit.image_url"
+                        class="w-10 h-10 rounded-md object-cover border border-gray-100 shrink-0" />
+                    <div class="min-w-0 flex-1">
+                        <p class="font-medium text-gray-900 text-xs truncate">{{ visit.name }}</p>
+                        <p class="text-[11px] text-gray-500 mt-0.5 truncate">{{ visit.nationality }} · {{
+                            visit.typeOfVisa }}</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 mb-2.5">
+                    <div class="min-w-0">
+                        <p class="text-[10px] text-gray-500 mb-0.5">رقم التأشيرة</p>
+                        <p class="text-[11px] font-medium text-gray-900 font-mono break-words">{{ visit.visaNo }}</p>
+                    </div>
+                    <div class="min-w-0">
+                        <p class="text-[10px] text-gray-500 mb-0.5">رقم الصادر</p>
+                        <p class="text-[11px] font-medium text-gray-900 font-mono break-words">{{ visit.source_number }}
+                        </p>
+                    </div>
+                    <div class="min-w-0">
+                        <p class="text-[10px] text-gray-500 mb-0.5">رقم الجواز</p>
+                        <p class="text-[11px] font-medium text-gray-900 font-mono break-words">{{ visit.passportNo }}
+                        </p>
+                    </div>
+                    <div class="min-w-0">
+                        <p class="text-[10px] text-gray-500 mb-0.5">صالحة حتى</p>
+                        <p class="text-[11px] font-medium text-gray-900 font-mono break-words">{{ visit.validUntil }}
+                        </p>
+                    </div>
+                    <div class="min-w-0 col-span-2">
+                        <p class="text-[10px] text-gray-500 mb-0.5">آخر عملية بحث</p>
+                        <p class="text-[11px] font-medium text-gray-900 font-mono break-words">
+                            {{ visit.lastSearchedAt ? (visit.lastSearchedAt | date:'dd/MM/yyyy hh:mm a') : '—' }}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2 pt-2 border-t border-gray-100">
+                    <a [routerLink]="['/visits', visit._id, 'edit']"
+                        class="flex-1 flex items-center justify-center gap-1 p-1.5 text-[11px] text-gray-600 hover:text-amber-600 hover:bg-amber-50 rounded transition">
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15.232 5.232l3.536 3.536M9 11l6.5-6.5a2 2 0 112.828 2.828L11.828 13.828A2 2 0 0110 14H8v-2a2 2 0 01.586-1.414z" />
+                        </svg>
+                        تعديل
+                    </a>
+                    <button (click)="deleteVisit(visit._id)" [disabled]="isDeleting === visit._id"
+                        class="flex-1 flex items-center justify-center gap-1 p-1.5 text-[11px] text-gray-600 hover:text-red-600 hover:bg-red-50 rounded transition disabled:opacity-50">
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                        حذف
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div *ngIf="!isLoading && pagination.pages > 1"
+            class="flex flex-col sm:flex-row items-center justify-between gap-2 px-3 py-2 border-t border-gray-100">
+            <p class="text-[11px] text-gray-500">صفحة {{ pagination.page }} من {{ pagination.pages }}</p>
+            <div class="flex items-center gap-1 flex-wrap justify-center">
+                <button (click)="goToPage(pagination.page - 1)" [disabled]="pagination.page === 1"
+                    class="px-2 py-0.5 text-[11px] rounded border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 transition">
+                    السابق
+                </button>
+                <button *ngFor="let p of getPagesArray()" (click)="goToPage(p)"
+                    [class.bg-indigo-600]="p === pagination.page" [class.text-white]="p === pagination.page"
+                    class="px-2 py-0.5 text-[11px] rounded border border-gray-200 text-gray-600 hover:bg-gray-50 transition">
+                    {{ p }}
+                </button>
+                <button (click)="goToPage(pagination.page + 1)" [disabled]="pagination.page === pagination.pages"
+                    class="px-2 py-0.5 text-[11px] rounded border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 transition">
+                    التالي
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
