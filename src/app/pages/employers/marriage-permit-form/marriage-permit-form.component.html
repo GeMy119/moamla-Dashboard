@@ -1,126 +1,190 @@
 <div class="space-y-5">
 
-    <!-- Header -->
-    <div class="flex items-center gap-3">
-        <button (click)="goBack()"
-            class="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition">
-            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-            </svg>
-        </button>
+  <!-- Header -->
+  <div class="flex items-center gap-3">
+    <button (click)="goBack()" class="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition">
+      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+      </svg>
+    </button>
+    <div>
+      <h1 class="text-xl font-bold text-gray-900">
+        {{ isEditMode ? 'تعديل تصريح الزواج' : 'إضافة تصريح زواج' }}
+      </h1>
+      <p class="text-sm text-gray-500 mt-0.5">قم بملء البيانات التالية</p>
+    </div>
+  </div>
+
+  <!-- Fetching Indicator -->
+  <div *ngIf="isFetching" class="flex items-center justify-center py-20">
+    <svg class="animate-spin h-7 w-7 text-indigo-600" fill="none" viewBox="0 0 24 24">
+      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+    </svg>
+  </div>
+
+  <div *ngIf="!isFetching" class="space-y-5">
+
+    <!-- 🔹 قائمة اختيار الكفيل (تظهر فقط عند الفتح من الناف بار بدون ID في الرابط) -->
+    <div *ngIf="!employerIdFromUrl" class="bg-indigo-50/50 p-4 rounded-xl border border-indigo-100">
+      <label class="block text-sm font-semibold text-indigo-900 mb-1.5">اختيار الكفيل <span
+          class="text-red-500">*</span></label>
+      <select name="selectedEmployerId" [(ngModel)]="selectedEmployerId" (change)="onEmployerChange()" required
+        class="w-full px-3 py-2.5 bg-white border border-indigo-200 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
+        <option value="" disabled selected>-- اختر الكفيل من القائمة --</option>
+        <option *ngFor="let emp of employersList" [value]="emp._id">
+          {{ emp.name }} - (هوية: {{ emp.identity_number }})
+        </option>
+      </select>
+    </div>
+
+    <!-- 🔹 بطاقة عرض بيانات الكفيل المختار -->
+    <div *ngIf="selectedEmployer"
+      class="bg-gradient-to-r from-indigo-900 to-slate-900 text-white rounded-xl shadow-sm p-5 transition-all">
+      <div class="flex items-center justify-between border-b border-indigo-700/50 pb-3 mb-3">
+        <div class="flex items-center gap-2">
+          <svg class="w-5 h-5 text-indigo-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+          </svg>
+          <span class="text-xs font-semibold uppercase tracking-wider text-indigo-200">بيانات صاحب الطلب</span>
+        </div>
+        <span
+          class="bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs px-2.5 py-1 rounded-full font-medium">
+          {{isEditMode? 'تعديل تصريح زواج' : 'إضافة تصريح زواج'}}
+        </span>
+      </div>
+
+      <div class="grid grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4">
+        <div class="bg-white/10 rounded-lg p-2 sm:p-3 min-w-0">
+          <p class="text-[10px] sm:text-xs text-indigo-200 mb-1">الاسم</p>
+          <p class="text-xs sm:text-sm font-medium text-white break-words">{{ selectedEmployer.name }}</p>
+        </div>
+
+        <div class="bg-white/10 rounded-lg p-2 sm:p-3 min-w-0">
+          <p class="text-[10px] sm:text-xs text-indigo-200 mb-1">رقم الهوية</p>
+          <p class="text-xs sm:text-sm font-medium text-white break-words">{{ selectedEmployer.identity_number
+            }}</p>
+        </div>
+
+        <div class="bg-white/10 rounded-lg p-2 sm:p-3 min-w-0">
+          <p class="text-[10px] sm:text-xs text-indigo-200 mb-1">رقم الصادر</p>
+          <p class="text-xs sm:text-sm font-medium text-white break-words">{{ selectedEmployer.source_number
+            }}</p>
+        </div>
+
+        <div class="bg-white/10 rounded-lg p-2 sm:p-3 min-w-0">
+          <p class="text-[10px] sm:text-xs text-indigo-200 mb-1">رقم الملف</p>
+          <p class="text-xs sm:text-sm font-medium text-white break-words">{{ selectedEmployer.file_number }}
+          </p>
+        </div>
+
+        <div class="bg-white/10 rounded-lg p-2 sm:p-3 min-w-0">
+          <p class="text-[10px] sm:text-xs text-indigo-200 mb-1">اسم الشركة</p>
+          <p class="text-xs sm:text-sm font-medium text-white break-words">{{ selectedEmployer.company_name }}
+          </p>
+        </div>
+
+        <div class="bg-white/10 rounded-lg p-2 sm:p-3 min-w-0">
+          <p class="text-[10px] sm:text-xs text-indigo-200 mb-1">رقم المرجع</p>
+          <p class="text-xs sm:text-sm font-medium text-white break-words">{{
+            selectedEmployer.reference_number }}</p>
+        </div>
+
+        <div class="bg-white/10 rounded-lg p-2 sm:p-3 col-span-2 lg:col-span-3 min-w-0">
+          <p class="text-[10px] sm:text-xs text-indigo-200 mb-1">العنوان</p>
+          <p class="text-xs sm:text-sm font-medium text-white break-words">{{ selectedEmployer.address }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Form Body -->
+    <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+
+      <div *ngIf="errorMessage" class="mb-5 bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg px-4 py-3">
+        {{ errorMessage }}
+      </div>
+
+      <form (ngSubmit)="onSubmit()" class="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+        <!-- الحالة -->
         <div>
-            <h1 class="text-xl font-bold text-gray-900">
-                {{ isEditMode ? 'تعديل تصريح الزواج' : 'إضافة تصريح زواج' }}
-            </h1>
-            <p class="text-sm text-gray-500 mt-0.5">قم بملء البيانات التالية</p>
-        </div>
-    </div>
-
-    <!-- Fetching -->
-    <div *ngIf="isFetching" class="flex items-center justify-center py-20">
-        <svg class="animate-spin h-7 w-7 text-indigo-600" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-        </svg>
-    </div>
-
-    <!-- Form -->
-    <div *ngIf="!isFetching" class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
-
-        <div *ngIf="errorMessage"
-            class="mb-5 bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg px-4 py-3">
-            {{ errorMessage }}
+          <label class="block text-sm font-medium text-gray-700 mb-1">الحالة</label>
+          <select name="status" [(ngModel)]="formData.status" required
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
+            <option value="accepted">تمت الموافقة</option>
+            <option value="cancled">تم الإلغاء</option>
+          </select>
         </div>
 
-        <form (ngSubmit)="onSubmit()" class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <!-- الاسم -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">الاسم</label>
+          <input type="text" name="name" [(ngModel)]="formData.name" required
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" />
+        </div>
 
-            <!-- 🔹 قائمة اختيار الكفيل (تظهر فقط عند الفتح من الناف بار) -->
-            <div *ngIf="!employerIdFromUrl"
-                class="md:col-span-2 bg-indigo-50/50 p-4 rounded-xl border border-indigo-100 mb-2">
-                <label class="block text-sm font-semibold text-indigo-900 mb-1">اختيار الكفيل <span
-                        class="text-red-500">*</span></label>
-                <select name="selectedEmployerId" [(ngModel)]="selectedEmployerId" (change)="onEmployerChange()"
-                    required
-                    class="w-full px-3 py-2.5 bg-white border border-indigo-200 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
-                    <option value="" disabled selected>-- اختر الكفيل من القائمة --</option>
-                    <option *ngFor="let emp of employersList" [value]="emp._id">
-                        {{ emp.name }} - (هوية: {{ emp.identity_number }})
-                    </option>
-                </select>
-            </div>
-            <!-- الحالة -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">الحالة</label>
-                <select name="status" [(ngModel)]="formData.status" required
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
-                    <option value="accepted">تمت الموافقة</option>
-                    <option value="cancled">تم الإلغاء</option>
-                </select>
-            </div>
+        <!-- فئة المهنة -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">فئة المهنة</label>
+          <input type="text" name="ProfessionCategory" [(ngModel)]="formData.ProfessionCategory" required
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" />
+        </div>
 
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">الاسم</label>
-                <input type="text" name="name" [(ngModel)]="formData.name" required
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" />
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">فئة المهنة</label>
-                <input type="text" name="ProfessionCategory" [(ngModel)]="formData.ProfessionCategory" required
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" />
-            </div>
+        <!-- جنسية الزوجة -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">الجنسية</label>
+          <input type="text" name="wife_nationality" [(ngModel)]="formData.wife_nationality" required
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" />
+        </div>
 
-            <!-- جنسية الزوجة -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">الجنسية</label>
-                <input type="text" name="wife_nationality" [(ngModel)]="formData.wife_nationality" required
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" />
-            </div>
+        <!-- تاريخ الإصدار -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">تاريخ الإصدار</label>
+          <input type="date" name="issue_date" [(ngModel)]="formData.issue_date" required
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" />
+        </div>
 
-            <!-- تاريخ الإصدار -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">تاريخ الإصدار</label>
-                <input type="string" name="issue_date" [(ngModel)]="formData.issue_date" required
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" />
-            </div>
+        <!-- تاريخ الإرسال -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">تاريخ الإرسال</label>
+          <input type="date" name="sending_date" [(ngModel)]="formData.sending_date" required
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" />
+        </div>
 
-            <!-- تاريخ الإرسال -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">تاريخ الإرسال</label>
-                <input type="string" name="sending_date" [(ngModel)]="formData.sending_date" required
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" />
-            </div>
+        <!-- مكان القدوم -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">مكان القدوم</label>
+          <input type="text" name="arrival_port" [(ngModel)]="formData.arrival_port" required
+            placeholder="مطار الرياض، جدة..."
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" />
+        </div>
 
-            <!-- مكان القدوم -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">مكان القدوم</label>
-                <input type="text" name="arrival_port" [(ngModel)]="formData.arrival_port" required
-                    placeholder="مطار الرياض، جدة..."
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" />
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">رقم الملف المرسل للبنك</label>
-                <input type="text" name="file_number" [(ngModel)]="formData.file_number" required
-                    placeholder="رقم الملف..."
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" />
-            </div>
+        <!-- رقم الملف المرسل للبنك -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">رقم الملف المرسل للبنك</label>
+          <input type="text" name="file_number" [(ngModel)]="formData.file_number" required placeholder="رقم الملف..."
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" />
+        </div>
 
-            <!-- Buttons -->
-            <div class="md:col-span-2 flex items-center justify-end gap-3 pt-2 border-t border-gray-100 mt-2">
-                <button type="button" (click)="goBack()"
-                    class="px-5 py-2 text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition">
-                    إلغاء
-                </button>
-                <button type="submit" [disabled]="isLoading"
-                    class="flex items-center gap-2 px-5 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 rounded-lg transition">
-                    <svg *ngIf="isLoading" class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
-                        </circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-                    </svg>
-                    {{ isLoading ? 'جاري الحفظ...' : isEditMode ? 'حفظ التعديلات' : 'إضافة التصريح' }}
-                </button>
-            </div>
+        <!-- Buttons -->
+        <div class="md:col-span-2 flex items-center justify-end gap-3 pt-2 border-t border-gray-100 mt-2">
+          <button type="button" (click)="goBack()"
+            class="px-5 py-2 text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition">
+            إلغاء
+          </button>
+          <button type="submit" [disabled]="isLoading"
+            class="flex items-center gap-2 px-5 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 rounded-lg transition">
+            <svg *ngIf="isLoading" class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+            </svg>
+            {{ isLoading ? 'جاري الحفظ...' : isEditMode ? 'حفظ التعديلات' : 'إضافة التصريح' }}
+          </button>
+        </div>
 
-        </form>
+      </form>
     </div>
+
+  </div>
 </div>

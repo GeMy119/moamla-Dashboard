@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { EmployerService } from '../../../services/employer.service.ts.service';
-import { ticket } from '../../../models/employer.model.ts';
+import { Employer, ticket } from '../../../models/employer.model.ts';
 
 @Component({
   selector: 'app-ticket-visa-review-form',
@@ -14,13 +14,15 @@ import { ticket } from '../../../models/employer.model.ts';
 export class TicketVisaReviewFormComponent implements OnInit {
   employerIdFromUrl: string | null = null;
   selectedEmployerId = '';
+  selectedEmployer!: Employer; // تخزين كائن الكفيل المختار لإظهار بياناته
+
   reviewId = '';
   isEditMode = false;
   isLoading = false;
   isFetching = false;
   errorMessage = '';
 
-  employersList: any[] = [];
+  employersList: Employer[] = [];
 
   formData: ticket = {
     nationality: '',
@@ -43,6 +45,7 @@ export class TicketVisaReviewFormComponent implements OnInit {
     if (this.employerIdFromUrl) {
       // 🔹 تم الفتح من صفحة كفيل محدد
       this.selectedEmployerId = this.employerIdFromUrl;
+      this.checkEditModeAndLoadData(this.selectedEmployerId);
       if (this.isEditMode) {
         this.fetchReview();
       }
@@ -128,5 +131,40 @@ export class TicketVisaReviewFormComponent implements OnInit {
 
   goBack() {
     window.history.back();
+  }
+
+  checkEditModeAndLoadData(employerId: string): void {
+    this.isFetching = true;
+    this.errorMessage = '';
+
+    this.employerService.getById(employerId).subscribe({
+      next: (res: any) => {
+        const employer = res.data || res;
+        this.selectedEmployer = employer; // 🔹 تخزين بيانات الكفيل لطباعتها أعلى الفورم
+
+        if (employer && employer.ticket_visa_review && employer.ticket_visa_review.status) {
+          this.isEditMode = true;
+          this.formData = { ...employer.ticket_visa_review };
+        } else {
+          // إعادة ضبط نموذج الإضافة في حال اختيار كفيل آخر ليس لديه تصريح
+          this.isEditMode = false;
+        }
+        this.isFetching = false;
+      },
+      error: (err) => {
+        this.errorMessage = 'حدث خطأ في جلب بيانات الكفيل';
+        this.isFetching = false;
+      }
+    });
+  }
+
+  // التعامل مع اختيار كفيل من Dropdown
+  onEmployerChange(): void {
+    if (this.selectedEmployerId) {
+      this.checkEditModeAndLoadData(this.selectedEmployerId);
+    }
+    if (this.employerIdFromUrl) {
+      this.checkEditModeAndLoadData(this.employerIdFromUrl);
+    }
   }
 }

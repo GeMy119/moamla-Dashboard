@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MarriagePermitDto } from '../../../models/employer.model.ts';
+import { Employer, MarriagePermitDto } from '../../../models/employer.model.ts';
 import { EmployerService } from '../../../services/employer.service.ts.service';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+
 
 @Component({
   imports: [FormsModule, CommonModule],
@@ -28,10 +29,11 @@ export class MarriagePermitFormComponent implements OnInit {
   isLoading: boolean = false;
   errorMessage: string = '';
 
-  // 🔹 المتغيرات الخاصة بالربط
+  // 🔹 المتغيرات الخاصة بالربط وتخزين بيانات الكفيل
   employerIdFromUrl: string | null = null;
   selectedEmployerId: string = '';
-  employersList: any[] = [];
+  employersList: Employer[] = [];
+  selectedEmployer!: Employer; // تخزين كائن الكفيل المختار لإظهار بياناته
 
   constructor(
     private route: ActivatedRoute,
@@ -48,7 +50,7 @@ export class MarriagePermitFormComponent implements OnInit {
       this.selectedEmployerId = this.employerIdFromUrl;
       this.checkEditModeAndLoadData(this.employerIdFromUrl);
     } else {
-      // تم الفتح من الناف بار -> جلب قائمة الكفلاء لاختيار كفيل
+      // تم الفتح من الناف بار -> جلب قائمة الكفلاء
       this.loadEmployers();
     }
   }
@@ -56,10 +58,8 @@ export class MarriagePermitFormComponent implements OnInit {
   // جلب قائمة الكفلاء للـ Dropdown
   loadEmployers(): void {
     this.isFetching = true;
-    // نطلب عدد كبير من الكفلاء لضمان ظهورهم في القائمة
     this.employerService.getAll(1, 1000).subscribe({
       next: (res) => {
-        // الـ EmployersResponse تحتوي عادة على data أو قائمة الكفلاء مباشرة
         this.employersList = (res as any).data || (res as any).employers || res;
         this.isFetching = false;
       },
@@ -70,29 +70,50 @@ export class MarriagePermitFormComponent implements OnInit {
     });
   }
 
-  // فحص هل الكفيل لديه تصريح زواج موجود مسبقاً لتعديله أم لإضافته
   checkEditModeAndLoadData(employerId: string): void {
     this.isFetching = true;
+    this.errorMessage = '';
+
     this.employerService.getById(employerId).subscribe({
       next: (res: any) => {
         const employer = res.data || res;
+        this.selectedEmployer = employer; // 🔹 تخزين بيانات الكفيل لطباعتها أعلى الفورم
+
         if (employer && employer.marriage_permit && employer.marriage_permit.status) {
           this.isEditMode = true;
           this.formData = { ...employer.marriage_permit };
+        } else {
+          // إعادة ضبط نموذج الإضافة في حال اختيار كفيل آخر ليس لديه تصريح
+          this.isEditMode = false;
+          this.resetForm();
         }
         this.isFetching = false;
       },
       error: (err) => {
+        this.errorMessage = 'حدث خطأ في جلب بيانات الكفيل';
         this.isFetching = false;
       }
     });
   }
 
-  // التعامل مع اختيار كفيل من القائمة (عند الفتح من الناف بار)
+  // التعامل مع اختيار كفيل من Dropdown
   onEmployerChange(): void {
     if (this.selectedEmployerId) {
       this.checkEditModeAndLoadData(this.selectedEmployerId);
     }
+  }
+
+  resetForm(): void {
+    this.formData = {
+      name: '',
+      status: 'accepted',
+      ProfessionCategory: '',
+      wife_nationality: '',
+      issue_date: '',
+      sending_date: '',
+      arrival_port: '',
+      file_number: ''
+    };
   }
 
   onSubmit(): void {
@@ -105,7 +126,6 @@ export class MarriagePermitFormComponent implements OnInit {
     this.errorMessage = '';
 
     if (this.isEditMode) {
-      // 🔹 تعديل تصريح الزواج
       this.employerService.updateMarriagePermit(this.selectedEmployerId, this.formData).subscribe({
         next: () => {
           this.isLoading = false;
@@ -117,7 +137,6 @@ export class MarriagePermitFormComponent implements OnInit {
         }
       });
     } else {
-      // 🔹 إضافة تصريح زواج جديد
       this.employerService.addMarriagePermit(this.selectedEmployerId, this.formData).subscribe({
         next: () => {
           this.isLoading = false;

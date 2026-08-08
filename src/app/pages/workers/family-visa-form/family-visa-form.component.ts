@@ -5,6 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FamilyVisaService } from '../../../services/family-visa.service';
 import { WorkerService } from '../../../services/worker.service';
 import { CreateFamilyVisaDto } from '../../../models/family-visa.model.ts';
+import { Worker } from '../../../models/worker.model.ts';
 
 @Component({
   selector: 'app-family-visa-form',
@@ -20,7 +21,8 @@ export class FamilyVisaFormComponent implements OnInit {
   isFetching = false;
   errorMessage = '';
 
-  workersList: any[] = [];
+  workersList: Worker[] = [];
+  selectedWorker: Worker | null = null; // 🔹 كائن لتخزين بيانات العامل المعروض في البطاقة
 
   formData: CreateFamilyVisaDto = {
     worker_id: '',
@@ -44,8 +46,8 @@ export class FamilyVisaFormComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.workerIdFromUrl = this.route.snapshot.params['workerId'];
-    this.visaId = this.route.snapshot.params['id'];
+    this.workerIdFromUrl = this.route.snapshot.params['workerId'] || '';
+    this.visaId = this.route.snapshot.params['id'] || '';
     this.isEditMode = !!this.visaId;
 
     if (this.isEditMode) {
@@ -54,6 +56,7 @@ export class FamilyVisaFormComponent implements OnInit {
     } else if (this.workerIdFromUrl) {
       // 🔹 وضع الإضافة من صفحة عامل محدد
       this.formData.worker_id = this.workerIdFromUrl;
+      this.loadWorkerDetails(this.workerIdFromUrl);
     } else {
       // 🔹 وضع الإضافة المباشرة من الناف بار -> جلب قائمة العمال
       this.loadWorkers();
@@ -73,6 +76,32 @@ export class FamilyVisaFormComponent implements OnInit {
         this.isFetching = false;
       },
     });
+  }
+
+  // جلب تفاصيل العامل المحدد لبطاقة العرض
+  loadWorkerDetails(workerId: string) {
+    if (!workerId) {
+      this.selectedWorker = null;
+      return;
+    }
+
+    this.workerService.getById(workerId).subscribe({
+      next: (res: any) => {
+        this.selectedWorker = res.data || res;
+      },
+      error: () => {
+        this.errorMessage = 'حدث خطأ في جلب بيانات العامل';
+      }
+    });
+  }
+
+  // عند تغير اختيار العامل من القائمة المنسدلة
+  onWorkerChange() {
+    if (this.formData.worker_id) {
+      this.loadWorkerDetails(this.formData.worker_id);
+    } else {
+      this.selectedWorker = null;
+    }
   }
 
   fetchVisa() {
@@ -95,6 +124,12 @@ export class FamilyVisaFormComponent implements OnInit {
           releaseDate: v.releaseDate,
           age: v.age
         };
+
+        // 🔹 جلب بيانات العامل لتأكيد عرض الكارت عند التعديل
+        if (targetWorkerId) {
+          this.loadWorkerDetails(targetWorkerId);
+        }
+
         this.isFetching = false;
       },
       error: () => {
@@ -102,6 +137,15 @@ export class FamilyVisaFormComponent implements OnInit {
         this.isFetching = false;
       },
     });
+  }
+
+  // دالة مساعدة لجلب اسم الكفيل
+  getEmployerName(): string {
+    if (!this.selectedWorker || !this.selectedWorker.employer_id) return 'غير متوفر';
+    if (typeof this.selectedWorker.employer_id === 'object') {
+      return (this.selectedWorker.employer_id as any).name || 'غير متوفر';
+    }
+    return 'متوفر';
   }
 
   onSubmit() {

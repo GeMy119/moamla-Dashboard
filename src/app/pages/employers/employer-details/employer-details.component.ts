@@ -87,7 +87,7 @@ export class EmployerDetailsComponent implements OnInit {
   }
 
   getIqamaStatusClass(status?: string) {
-    if (status === 'سارية') return 'bg-green-50 text-green-700 border border-green-200';
+    if (status === 'سارية' || status === 'ساريه') return 'bg-green-50 text-green-700 border border-green-200';
     if (status === 'منتهية') return 'bg-red-50 text-red-700 border border-red-200';
     return 'bg-gray-50 text-gray-700 border border-gray-200';
   }

@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { WorkerService } from '../../../services/worker.service';
-import { Alert } from '../../../models/worker.model.ts';
+import { Alert, Worker } from '../../../models/worker.model.ts';
 
 @Component({
   selector: 'app-alert-form',
@@ -19,7 +19,7 @@ export class AlertFormComponent implements OnInit {
   isLoading = false;
   isFetching = false;
   errorMessage = '';
-  workersList: any[] = [];
+  workersList: Worker[] = [];
 
   formData: Alert = {
     type: undefined,

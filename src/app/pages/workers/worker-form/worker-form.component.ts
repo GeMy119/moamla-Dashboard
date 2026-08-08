@@ -3,9 +3,9 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { WorkerService } from '../../../services/worker.service';
-import { CreateWorkerDto } from '../../../models/worker.model.ts';
 import { EmployerService } from '../../../services/employer.service.ts.service';
-
+import { Employer } from '../../../models/employer.model.ts';
+import { CreateWorkerDto } from '../../../models/worker.model.ts';
 
 @Component({
   selector: 'app-worker-form',
@@ -21,7 +21,8 @@ export class WorkerFormComponent implements OnInit {
   isFetching = false;
   errorMessage = '';
 
-  employersList: any[] = [];
+  employersList: Employer[] = [];
+  selectedEmployer: Employer | null = null;
 
   formData: CreateWorkerDto = {
     employer_id: '',
@@ -45,21 +46,25 @@ export class WorkerFormComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.employerId = this.route.snapshot.params['employerId'];
-    this.workerId = this.route.snapshot.params['id'];
+    this.employerId = this.route.snapshot.params['employerId'] || '';
+    this.workerId = this.route.snapshot.params['id'] || '';
     this.isEditMode = !!this.workerId;
 
     if (this.isEditMode) {
+      // حالة التعديل على عامل حالي
       this.fetchWorker();
     } else if (this.employerId) {
+      // حالة إضافة عامل جديد مع كفيل محدد مسبقاً في الرابط
       this.formData.employer_id = this.employerId;
+      this.loadEmployerDetails(this.employerId);
     } else {
-      // 🔹 في حالة الإضافة المباشرة بدون كفيل في الرابط -> جلب قائمة الكفلاء
-      this.loadEmployers();
+      // حالة إضافة عامل جديد بدون كفيل محدد -> جلب قائمة الكفلاء للاختيار
+      this.loadEmployersList();
     }
   }
 
-  loadEmployers() {
+  // جلب قائمة الكفلاء للاختيار منها
+  loadEmployersList() {
     this.isFetching = true;
     this.employerService.getAll(1, 1000).subscribe({
       next: (res: any) => {
@@ -73,6 +78,23 @@ export class WorkerFormComponent implements OnInit {
     });
   }
 
+  loadEmployerDetails(empId: string) {
+    if (!empId) {
+      this.selectedEmployer = null;
+      return;
+    }
+
+    this.employerService.getById(empId).subscribe({
+      next: (res: any) => {
+        this.selectedEmployer = res.data || res;
+      },
+      error: () => {
+        this.errorMessage = 'حدث خطأ في جلب بيانات الكفيل';
+      }
+    });
+  }
+
+  // جلب بيانات العامل في حالة التعديل
   fetchWorker() {
     this.isFetching = true;
     this.workerService.getById(this.workerId).subscribe({
@@ -89,10 +111,16 @@ export class WorkerFormComponent implements OnInit {
           address: w.address,
           account_number: w.account_number,
           iqama_number: w.iqama_number,
-          iqama_expiry_date: w.iqama_expiry_date ? w.iqama_expiry_date.split('T')[0] : '',
+          iqama_expiry_date: w.iqama_expiry_date,
           iqama_status: w.iqama_status,
-          iqama_issue_date: w.iqama_issue_date ? w.iqama_issue_date.split('T')[0] : '',
+          iqama_issue_date: w.iqama_issue_date,
         };
+
+        // جلب تفاصيل الكفيل للعامل المطلوب تعديله
+        if (targetEmployerId) {
+          this.loadEmployerDetails(targetEmployerId);
+        }
+
         this.isFetching = false;
       },
       error: () => {
@@ -100,6 +128,15 @@ export class WorkerFormComponent implements OnInit {
         this.isFetching = false;
       },
     });
+  }
+
+  // التعامل مع تغيير الكفيل من القائمة المنسدلة
+  onEmployerChange(): void {
+    if (this.formData.employer_id) {
+      this.loadEmployerDetails(this.formData.employer_id);
+    } else {
+      this.selectedEmployer = null;
+    }
   }
 
   onSubmit() {
