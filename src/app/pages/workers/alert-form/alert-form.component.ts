@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { WorkerService } from '../../../services/worker.service';
-import { Alert, Worker } from '../../../models/worker.model.ts';
+import { Alert, EmployerRef, Worker, WorkerResponse } from '../../../models/worker.model.ts';
 
 @Component({
   selector: 'app-alert-form',
@@ -11,10 +11,10 @@ import { Alert, Worker } from '../../../models/worker.model.ts';
   imports: [CommonModule, FormsModule],
   templateUrl: './alert-form.component.html',
 })
-
 export class AlertFormComponent implements OnInit {
   workerIdFromUrl: string | null = null;
   selectedWorkerId = '';
+  selectedWorker: Worker | null = null;
   isEditMode = false;
   isLoading = false;
   isFetching = false;
@@ -39,23 +39,21 @@ export class AlertFormComponent implements OnInit {
     this.isEditMode = this.route.snapshot.url.some((seg) => seg.path === 'edit');
 
     if (this.workerIdFromUrl) {
-      // 🔹 تم الفتح من صفحة عامل محدد
       this.selectedWorkerId = this.workerIdFromUrl;
-      if (this.isEditMode) {
-        this.fetchAlert();
-      }
+      this.fetchAlert();
     } else {
-      // 🔹 تم الفتح من الناف بار مباشرة -> جلب قائمة العمال
       this.loadWorkers();
     }
   }
 
-  // جلب قائمة العمال للـ Dropdown
   loadWorkers() {
     this.isFetching = true;
     this.workerService.getAll({ page: 1, limit: 1000 }).subscribe({
       next: (res: any) => {
         this.workersList = res.data || res.workers || res;
+        if (this.selectedWorkerId) {
+          this.selectedWorker = this.workersList.find(w => w._id === this.selectedWorkerId) || null;
+        }
         this.isFetching = false;
       },
       error: () => {
@@ -65,27 +63,32 @@ export class AlertFormComponent implements OnInit {
     });
   }
 
-  // عند اختيار عامل من القائمة
   onWorkerChange() {
     if (this.selectedWorkerId) {
+      this.selectedWorker = this.workersList.find(w => w._id === this.selectedWorkerId) || null;
       this.fetchAlert();
+    } else {
+      this.selectedWorker = null;
+      this.resetForm();
     }
   }
 
-  // جلب بلاغات العامل لتحديد حالة التعديل أو الإضافة تلقائياً
   fetchAlert() {
     if (!this.selectedWorkerId) return;
 
     this.isFetching = true;
     this.workerService.getById(this.selectedWorkerId).subscribe({
-      next: (res: any) => {
-        const worker = res.data || res;
-        if (worker && worker.alerts) {
-          this.isEditMode = true;
-          this.formData = { ...worker.alerts };
-        } else {
-          this.isEditMode = false;
-          this.resetForm();
+      next: (res: WorkerResponse) => {
+        const worker: Worker = res.data || res;
+        if (worker) {
+          this.selectedWorker = worker;
+          if (worker.alerts) {
+            this.isEditMode = true;
+            this.formData = { ...worker.alerts };
+          } else {
+            this.isEditMode = false;
+            this.resetForm();
+          }
         }
         this.isFetching = false;
       },
@@ -94,6 +97,22 @@ export class AlertFormComponent implements OnInit {
         this.isFetching = false;
       },
     });
+  }
+
+  // 🔹 دالة مساعدة لاستخراج اسم الكفيل بآمان وتجنب خطأ TypeScript
+  getEmployerName(): string {
+    if (this.selectedWorker?.employer_id && typeof this.selectedWorker.employer_id === 'object') {
+      return (this.selectedWorker.employer_id as EmployerRef).name || '—';
+    }
+    return '—';
+  }
+
+  // 🔹 دالة مساعدة لاستخراج رقم هوية الكفيل بآمان
+  getEmployerIdentity(): string {
+    if (this.selectedWorker?.employer_id && typeof this.selectedWorker.employer_id === 'object') {
+      return (this.selectedWorker.employer_id as EmployerRef).identity_number || '—';
+    }
+    return '—';
   }
 
   resetForm() {

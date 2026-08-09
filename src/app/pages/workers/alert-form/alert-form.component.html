@@ -1,5 +1,6 @@
-<div class="space-y-5 max-w-xl">
+<div class="space-y-5">
 
+    <!-- Header -->
     <div class="flex items-center gap-3">
         <button (click)="goBack()"
             class="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition">
@@ -12,10 +13,12 @@
         </h1>
     </div>
 
+    <!-- Error Message -->
     <div *ngIf="errorMessage" class="bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg px-4 py-3">
         {{ errorMessage }}
     </div>
 
+    <!-- Spinner -->
     <div *ngIf="isFetching" class="flex items-center justify-center py-20">
         <svg class="animate-spin h-7 w-7 text-indigo-600" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -23,10 +26,11 @@
         </svg>
     </div>
 
+    <!-- Form -->
     <form *ngIf="!isFetching" (ngSubmit)="onSubmit()"
         class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 space-y-4">
 
-        <!-- 🔹 قائمة اختيار العامل (تظهر فقط عند الدخول من الناف بار) -->
+        <!-- 🔹 اختيار العامل (يظهر فقط عند الفتح بدون ID) -->
         <div *ngIf="!workerIdFromUrl" class="bg-indigo-50/50 p-4 rounded-xl border border-indigo-100 mb-2">
             <label class="block text-sm font-semibold text-indigo-900 mb-1">اختيار العامل <span
                     class="text-red-500">*</span></label>
@@ -40,38 +44,110 @@
             </select>
         </div>
 
-        <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1.5">نوع البلاغ</label>
-            <select name="type" [(ngModel)]="formData.type" required
-                class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                <option [ngValue]="undefined" disabled>اختر النوع</option>
-                <option value="بلاغ تغيب">بلاغ تغيب</option>
-                <option value="الغاء بلاغ">الغاء بلاغ</option>
-            </select>
+        <!-- 🔹 كارت عرض تفاصيل العامل والكفيل -->
+        <div *ngIf="selectedWorker"
+            class="bg-gradient-to-r from-indigo-900 to-slate-900 text-white rounded-xl shadow-sm p-5 transition-all">
+            <div class="flex items-center justify-between border-b border-indigo-700/50 pb-3 mb-3">
+                <div class="flex items-center gap-2">
+                    <svg class="w-5 h-5 text-indigo-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                    <span class="text-xs font-semibold uppercase tracking-wider text-indigo-200">بيانات العامل
+                        والكفيل</span>
+                </div>
+                <span
+                    class="bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs px-2.5 py-1 rounded-full font-medium">
+                    {{isEditMode? 'تعديل البلاغ' : 'إضافة بلاغ'}}
+                </span>
+            </div>
+            <div class="grid grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4">
+                <!-- بيانات العامل -->
+
+                <div class="bg-white/10 rounded-lg p-2 sm:p-3 min-w-0">
+                    <p class="text-[10px] sm:text-xs text-indigo-200 mb-1">اسم العامل</p>
+                    <p class="text-xs sm:text-sm font-medium text-white break-words">{{ selectedWorker.name }}</p>
+                </div>
+                <div class="bg-white/10 rounded-lg p-2 sm:p-3 min-w-0">
+                    <p class="text-[10px] sm:text-xs text-indigo-200 mb-1">رقم الإقامة/الهوية</p>
+                    <p class="text-xs sm:text-sm font-medium text-white break-words">{{ selectedWorker.iqama_number ||
+                        selectedWorker.identity_number || '—' }}</p>
+                </div>
+                <div class="bg-white/10 rounded-lg p-2 sm:p-3 min-w-0">
+                    <p class="text-[10px] sm:text-xs text-indigo-200 mb-1">الجنسية</p>
+                    <p class="text-xs sm:text-sm font-medium text-white break-words">{{ selectedWorker.nationality ||
+                        '—' }}</p>
+                </div>
+                <div class="bg-white/10 rounded-lg p-2 sm:p-3 min-w-0">
+                    <p class="text-[10px] sm:text-xs text-indigo-200 mb-1">المهنة</p>
+                    <p class="text-xs sm:text-sm font-medium text-white break-words">{{ selectedWorker.profession ||
+                        '—' }}</p>
+                </div>
+                <div class="bg-white/10 rounded-lg p-2 sm:p-3 min-w-0">
+                    <p class="text-[10px] sm:text-xs text-indigo-200 mb-1">رقم الصادر</p>
+                    <p class="text-xs sm:text-sm font-medium text-white break-words">{{ selectedWorker.source_number ||
+                        '—' }}</p>
+                </div>
+
+                <div class="bg-white/10 rounded-lg p-2 sm:p-3 min-w-0">
+                    <p class="text-[10px] sm:text-xs text-indigo-200 mb-1">تاريخ اصدار الأقامة</p>
+                    <p class="text-xs sm:text-sm font-medium text-white break-words">{{ selectedWorker.iqama_issue_date
+                        ||
+                        '—' }}</p>
+                </div>
+
+
+                <!-- بيانات الكفيل (باستخدام الدعم الآمن للأنواع) -->
+                <div class="bg-white/10 rounded-lg p-2 sm:p-3 min-w-0">
+                    <p class="text-[10px] sm:text-xs text-indigo-200 mb-1">اسم الكفيل/الشركة</p>
+                    <p class="text-xs sm:text-sm font-medium text-white break-words">{{ getEmployerName() }}</p>
+                </div>
+                <div class="bg-white/10 rounded-lg p-2 sm:p-3 min-w-0">
+                    <p class="text-[10px] sm:text-xs text-indigo-200 mb-1">رقم الهوية/السجل للكفيل</p>
+                    <p class="text-xs sm:text-sm font-medium text-white break-words">{{ getEmployerIdentity() }}</p>
+                </div>
+            </div>
+        </div>
+        <!-- نوع البلاغ -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1.5">نوع البلاغ</label>
+                <select name="type" [(ngModel)]="formData.type" required
+                    class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <option [ngValue]="undefined" disabled>اختر النوع</option>
+                    <option value="بلاغ تغيب">بلاغ تغيب</option>
+                    <option value="الغاء بلاغ">الغاء بلاغ</option>
+                </select>
+            </div>
+
+            <!-- الحالة -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1.5">الحالة</label>
+                <select name="status" [(ngModel)]="formData.status" required
+                    class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <option [ngValue]="undefined" disabled>اختر الحالة</option>
+                    <option value="accepted">مقبول</option>
+                    <option value="rejected">مرفوض</option>
+                </select>
+            </div>
+
+            <!-- تاريخ التقديم -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1.5">تاريخ التقديم</label>
+                <input type="text" name="filed_date" [(ngModel)]="formData.filed_date" required placeholder="YYYY-MM-DD"
+                    class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            </div>
+
+            <!-- تاريخ الحل -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1.5">تاريخ الحل (اختياري)</label>
+                <input type="text" name="resolved_date" [(ngModel)]="formData.resolved_date" placeholder="YYYY-MM-DD"
+                    class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            </div>
         </div>
 
-        <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1.5">الحالة</label>
-            <select name="status" [(ngModel)]="formData.status" required
-                class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                <option [ngValue]="undefined" disabled>اختر الحالة</option>
-                <option value="accepted">مقبول</option>
-                <option value="rejected">مرفوض</option>
-            </select>
-        </div>
-
-        <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1.5">تاريخ التقديم</label>
-            <input type="text" name="filed_date" [(ngModel)]="formData.filed_date" required placeholder="YYYY-MM-DD"
-                class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-        </div>
-
-        <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1.5">تاريخ الحل (اختياري)</label>
-            <input type="text" name="resolved_date" [(ngModel)]="formData.resolved_date" placeholder="YYYY-MM-DD"
-                class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-        </div>
-
+        <!-- أزرار الحفظ والإلغاء -->
         <div class="flex items-center gap-3 pt-2">
             <button type="submit" [disabled]="isLoading"
                 class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-5 py-2.5 rounded-lg transition disabled:opacity-50">

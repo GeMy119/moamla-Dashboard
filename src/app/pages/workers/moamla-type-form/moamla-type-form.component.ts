@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { WorkerService } from '../../../services/worker.service';
-import { MoamlaType } from '../../../models/worker.model.ts';
+import { Worker, EmployerRef, MoamlaType, WorkerResponse } from '../../../models/worker.model.ts';
 
 @Component({
   selector: 'app-moamla-type-form',
@@ -15,16 +15,16 @@ import { MoamlaType } from '../../../models/worker.model.ts';
 export class MoamlaTypeFormComponent implements OnInit {
   workerId = '';
   moamlaId = '';
-  selectedWorkerId = ''; // متغير منفصل تماماً لتحديد العامل في حال الإضافة المباشرة
+  selectedWorkerId = '';
+  selectedWorker: Worker | null = null;
 
   isEditMode = false;
   isLoading = false;
   isFetching = false;
   errorMessage = '';
 
-  workersList: any[] = [];
+  workersList: Worker[] = [];
 
-  // بيانات المعاملة فقط (تُرسل للـ Backend)
   formData: MoamlaType = {
     name: '',
     status: undefined,
@@ -43,11 +43,8 @@ export class MoamlaTypeFormComponent implements OnInit {
 
     if (this.workerId) {
       this.selectedWorkerId = this.workerId;
-    }
-
-    if (this.isEditMode) {
-      this.fetchMoamla();
-    } else if (!this.workerId) {
+      this.fetchWorkerDetails(this.workerId);
+    } else {
       this.loadWorkers();
     }
   }
@@ -58,6 +55,9 @@ export class MoamlaTypeFormComponent implements OnInit {
     this.workerService.getAll({ page: 1, limit: 1000 }).subscribe({
       next: (res: any) => {
         this.workersList = res.data || res.workers || res;
+        if (this.selectedWorkerId) {
+          this.selectedWorker = this.workersList.find(w => w._id === this.selectedWorkerId) || null;
+        }
         this.isFetching = false;
       },
       error: () => {
@@ -67,20 +67,28 @@ export class MoamlaTypeFormComponent implements OnInit {
     });
   }
 
-  fetchMoamla() {
+  // جلب بيانات العامل المحدَّد وتعبئة بيانات المعاملة في حالة التعديل
+  fetchWorkerDetails(workerId: string) {
     this.isFetching = true;
-    this.workerService.getById(this.workerId).subscribe({
-      next: (res: any) => {
-        const moamla = res.data?.moamla_type?.find(
-          (r: any) => r._id === this.moamlaId
-        );
-        if (moamla) {
-          this.formData = {
-            name: moamla.name,
-            status: moamla.status,
-          };
-        } else {
-          this.errorMessage = 'نوع المعاملة غير موجودة';
+    this.workerService.getById(workerId).subscribe({
+      next: (res: WorkerResponse) => {
+        const worker: Worker = res.data || res;
+        if (worker) {
+          this.selectedWorker = worker;
+
+          if (this.isEditMode) {
+            const moamla = worker.moamla_type?.find(
+              (r: MoamlaType) => r._id === this.moamlaId
+            );
+            if (moamla) {
+              this.formData = {
+                name: moamla.name,
+                status: moamla.status,
+              };
+            } else {
+              this.errorMessage = 'نوع المعاملة غير موجودة';
+            }
+          }
         }
         this.isFetching = false;
       },
@@ -91,8 +99,32 @@ export class MoamlaTypeFormComponent implements OnInit {
     });
   }
 
+  // عند اختيار عامل من القائمة المنسدلة
+  onWorkerChange() {
+    if (this.selectedWorkerId) {
+      this.selectedWorker = this.workersList.find(w => w._id === this.selectedWorkerId) || null;
+    } else {
+      this.selectedWorker = null;
+    }
+  }
+
+  // دالة مساعدة لاستخراج اسم الكفيل بأمان
+  getEmployerName(): string {
+    if (this.selectedWorker?.employer_id && typeof this.selectedWorker.employer_id === 'object') {
+      return (this.selectedWorker.employer_id as EmployerRef).name || '—';
+    }
+    return '—';
+  }
+
+  // دالة مساعدة لاستخراج رقم هوية الكفيل بأمان
+  getEmployerIdentity(): string {
+    if (this.selectedWorker?.employer_id && typeof this.selectedWorker.employer_id === 'object') {
+      return (this.selectedWorker.employer_id as EmployerRef).identity_number || '—';
+    }
+    return '—';
+  }
+
   onSubmit() {
-    // تحديد العامل إما من الرابط أو من القائمة المنسدلة في الـ HTML
     const targetWorkerId = this.selectedWorkerId || this.workerId;
 
     if (!targetWorkerId) {
@@ -103,7 +135,6 @@ export class MoamlaTypeFormComponent implements OnInit {
     this.isLoading = true;
     this.errorMessage = '';
 
-    // تجهيز كائن البيانات النظيف فقط بدون خلط الحقول
     const payload: MoamlaType = {
       name: this.formData.name,
       status: this.formData.status

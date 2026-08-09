@@ -14,7 +14,7 @@ export class SidebarComponent {
 
   links = [
     { label: 'الرئيسية', path: '/dashboard' },
-    { label: 'الكفلاء', path: '/employers' },
+    { label: 'الكفلاء السعوديين', path: '/employers' },
     { label: 'التأشيرات', path: '/visits' },
     { label: 'طلبات الجنسية', path: '/nationality-requests' },
     { label: 'العمال', path: '/workers' },
