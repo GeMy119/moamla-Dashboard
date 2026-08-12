@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { WorkerService } from '../../../services/worker.service';
@@ -9,7 +8,7 @@ import { Worker } from '../../../models/worker.model.ts';
 @Component({
   selector: 'app-workers',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule],
+  imports: [RouterLink, FormsModule],
   templateUrl: './workers.component.html',
 })
 export class WorkersComponent implements OnInit {

@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { WorkerService } from '../../../services/worker.service';
@@ -8,7 +7,7 @@ import { Alert, EmployerRef, Worker, WorkerResponse } from '../../../models/work
 @Component({
   selector: 'app-alert-form',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
   templateUrl: './alert-form.component.html',
 })
 export class AlertFormComponent implements OnInit {

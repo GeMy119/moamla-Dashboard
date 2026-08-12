@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { EmployerService } from '../../../services/employer.service.ts.service';
 import { Employer, PaginationMeta } from '../../../models/employer.model.ts';
@@ -7,7 +6,7 @@ import { Employer, PaginationMeta } from '../../../models/employer.model.ts';
 @Component({
   selector: 'app-employers',
   standalone: true,
-  imports: [RouterLink, CommonModule],
+  imports: [RouterLink],
   templateUrl: './employers.component.html',
 })
 export class EmployersComponent implements OnInit {

@@ -1,14 +1,14 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { VisitService } from '../../../services/visits.service';
 import { Visit } from '../../../models/visits.model.ts';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-visas',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule],
+  imports: [RouterLink, FormsModule, DatePipe],
   templateUrl: './visits.component.html',
 })
 export class VisitsComponent implements OnInit {

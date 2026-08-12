@@ -7,9 +7,11 @@
     </div>
 
     <!-- Error -->
-    <div *ngIf="errorMessage" class="bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg px-4 py-3">
+    @if (errorMessage) {
+    <div class="bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg px-4 py-3">
         {{ errorMessage }}
     </div>
+    }
 
     <!-- Stats Cards -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">

@@ -38,165 +38,179 @@
     </div>
 
     <!-- رسالة الخطأ -->
-    <div *ngIf="errorMessage" class="bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg px-4 py-3">
+    @if (errorMessage) {
+    <div class="bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg px-4 py-3">
         {{ errorMessage }}
     </div>
+    }
 
     <!-- حاوية عرض العمال -->
     <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
 
         <!-- مؤشر التحميل -->
-        <div *ngIf="isLoading" class="flex items-center justify-center py-20">
+        @if (isLoading) {
+        <div class="flex items-center justify-center py-20">
             <svg class="animate-spin h-7 w-7 text-indigo-600" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
             </svg>
         </div>
+        }
 
-        <div *ngIf="!isLoading">
+        @if (!isLoading) {
 
-            <!-- حالة عدم وجود عمال -->
-            <div *ngIf="workers.length === 0" class="text-center py-16 text-gray-400">
-                لا يوجد عمال مسجلون
-            </div>
-
-            <!-- 1. عرض الشاشات المتوسطة والكبيرة (الجدول التقليدي) -->
-            <div *ngIf="workers.length > 0" class="hidden md:block overflow-x-auto">
-                <table class="w-full text-sm text-right">
-                    <thead class="bg-gray-50 border-b border-gray-100 text-gray-500 font-medium">
-                        <tr>
-                            <th class="px-4 py-3">#</th>
-                            <th class="px-4 py-3">الاسم</th>
-                            <th class="px-4 py-3">رقم الهوية</th>
-                            <th class="px-4 py-3">الجنسية</th>
-                            <th class="px-4 py-3">المهنة</th>
-                            <th class="px-4 py-3">حالة الإقامة</th>
-                            <th class="px-4 py-3">الكفيل</th>
-                            <th class="px-4 py-3">الإجراءات</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-50">
-                        <tr *ngFor="let worker of workers; let i = index" class="hover:bg-gray-50 transition">
-                            <td class="px-4 py-3 text-gray-400">
-                                {{ (pagination.page - 1) * pagination.limit + i + 1 }}
-                            </td>
-                            <td class="px-4 py-3 font-medium text-gray-900">{{ worker.name }}</td>
-                            <td class="px-4 py-3 text-gray-600">{{ worker.identity_number }}</td>
-                            <td class="px-4 py-3 text-gray-600">{{ worker.nationality }}</td>
-                            <td class="px-4 py-3 text-gray-600">{{ worker.profession }}</td>
-                            <td class="px-4 py-3 text-gray-600">{{ worker.iqama_status }}</td>
-                            <td class="px-4 py-3 text-gray-600">{{ getEmployerName(worker) }}</td>
-                            <td class="px-4 py-3">
-                                <div class="flex items-center gap-2">
-                                    <a [routerLink]="['/workers', worker._id]"
-                                        class="p-1.5 text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition"
-                                        title="التفاصيل">
-                                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                        </svg>
-                                    </a>
-                                    <a [routerLink]="['/workers', worker._id, 'edit']"
-                                        class="p-1.5 text-gray-500 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition"
-                                        title="تعديل">
-                                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M15.232 5.232l3.536 3.536M9 11l6.5-6.5a2 2 0 112.828 2.828L11.828 13.828A2 2 0 0110 14H8v-2a2 2 0 01.586-1.414z" />
-                                        </svg>
-                                    </a>
-                                    <button (click)="deleteWorker(worker._id)" [disabled]="isDeleting === worker._id"
-                                        class="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition disabled:opacity-50"
-                                        title="حذف">
-                                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                        </svg>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- 2. عرض الشاشات الصغيرة/الموبايل (كروت متجاوبة) -->
-            <div *ngIf="workers.length > 0" class="block md:hidden divide-y divide-gray-100">
-                <div *ngFor="let worker of workers; let i = index" class="p-4 space-y-3 hover:bg-gray-50/50 transition">
-
-                    <!-- الهيدر الخاص بالكارت: الاسم والتسلسل -->
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-2">
-                            <span class="text-xs font-semibold text-gray-400 bg-gray-100 px-2 py-0.5 rounded">
-                                #{{ (pagination.page - 1) * pagination.limit + i + 1 }}
-                            </span>
-                            <h3 class="font-bold text-gray-900 text-base">{{ worker.name }}</h3>
-                        </div>
-                        <span class="text-xs font-medium px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700">
-                            {{ worker.iqama_status || 'غير محدد' }}
-                        </span>
-                    </div>
-
-                    <!-- تفاصيل البيانات -->
-                    <div class="grid grid-cols-2 gap-2 text-xs text-gray-600 pt-1">
-                        <div>
-                            <span class="text-gray-400 block mb-0.5">رقم الهوية:</span>
-                            <span class="font-medium text-gray-800">{{ worker.identity_number || '-' }}</span>
-                        </div>
-                        <div>
-                            <span class="text-gray-400 block mb-0.5">الجنسية:</span>
-                            <span class="font-medium text-gray-800">{{ worker.nationality || '-' }}</span>
-                        </div>
-                        <div>
-                            <span class="text-gray-400 block mb-0.5">المهنة:</span>
-                            <span class="font-medium text-gray-800">{{ worker.profession || '-' }}</span>
-                        </div>
-                        <div>
-                            <span class="text-gray-400 block mb-0.5">الكفيل:</span>
-                            <span class="font-medium text-gray-800 truncate block">{{ getEmployerName(worker) || '-'
-                                }}</span>
-                        </div>
-                    </div>
-
-                    <!-- أزرار الإجراءات للموبايل -->
-                    <div class="flex items-center justify-end gap-2 pt-2 border-t border-gray-50">
-                        <a [routerLink]="['/workers', worker._id]"
-                            class="flex items-center gap-1 text-xs font-medium px-3 py-1.5 text-indigo-600 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition">
-                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                            </svg>
-                            التفاصيل
-                        </a>
-                        <a [routerLink]="['/workers', worker._id, 'edit']"
-                            class="flex items-center gap-1 text-xs font-medium px-3 py-1.5 text-amber-700 bg-amber-50 rounded-lg hover:bg-amber-100 transition">
-                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M15.232 5.232l3.536 3.536M9 11l6.5-6.5a2 2 0 112.828 2.828L11.828 13.828A2 2 0 0110 14H8v-2a2 2 0 01.586-1.414z" />
-                            </svg>
-                            تعديل
-                        </a>
-                        <button (click)="deleteWorker(worker._id)" [disabled]="isDeleting === worker._id"
-                            class="flex items-center gap-1 text-xs font-medium px-3 py-1.5 text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition disabled:opacity-50">
-                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                            حذف
-                        </button>
-                    </div>
-
-                </div>
-            </div>
-
+        <!-- حالة عدم وجود عمال -->
+        @if (workers.length === 0) {
+        <div class="text-center py-16 text-gray-400">
+            لا يوجد عمال مسجلون
         </div>
+        }
+
+        <!-- 1. عرض الشاشات المتوسطة والكبيرة (الجدول التقليدي) -->
+        @if (workers.length > 0) {
+        <div class="hidden md:block overflow-x-auto">
+            <table class="w-full text-sm text-right">
+                <thead class="bg-gray-50 border-b border-gray-100 text-gray-500 font-medium">
+                    <tr>
+                        <th class="px-4 py-3">#</th>
+                        <th class="px-4 py-3">الاسم</th>
+                        <th class="px-4 py-3">رقم الهوية</th>
+                        <th class="px-4 py-3">الجنسية</th>
+                        <th class="px-4 py-3">المهنة</th>
+                        <th class="px-4 py-3">حالة الإقامة</th>
+                        <th class="px-4 py-3">الكفيل</th>
+                        <th class="px-4 py-3">الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-50">
+                    @for (worker of workers; track worker._id; let i = $index) {
+                    <tr class="hover:bg-gray-50 transition">
+                        <td class="px-4 py-3 text-gray-400">
+                            {{ (pagination.page - 1) * pagination.limit + i + 1 }}
+                        </td>
+                        <td class="px-4 py-3 font-medium text-gray-900">{{ worker.name }}</td>
+                        <td class="px-4 py-3 text-gray-600">{{ worker.identity_number }}</td>
+                        <td class="px-4 py-3 text-gray-600">{{ worker.nationality }}</td>
+                        <td class="px-4 py-3 text-gray-600">{{ worker.profession }}</td>
+                        <td class="px-4 py-3 text-gray-600">{{ worker.iqama_status }}</td>
+                        <td class="px-4 py-3 text-gray-600">{{ getEmployerName(worker) }}</td>
+                        <td class="px-4 py-3">
+                            <div class="flex items-center gap-2">
+                                <a [routerLink]="['/workers', worker._id]"
+                                    class="p-1.5 text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition"
+                                    title="التفاصيل">
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                    </svg>
+                                </a>
+                                <a [routerLink]="['/workers', worker._id, 'edit']"
+                                    class="p-1.5 text-gray-500 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition"
+                                    title="تعديل">
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15.232 5.232l3.536 3.536M9 11l6.5-6.5a2 2 0 112.828 2.828L11.828 13.828A2 2 0 0110 14H8v-2a2 2 0 01.586-1.414z" />
+                                    </svg>
+                                </a>
+                                <button (click)="deleteWorker(worker._id)" [disabled]="isDeleting === worker._id"
+                                    class="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition disabled:opacity-50"
+                                    title="حذف">
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        }
+
+        <!-- 2. عرض الشاشات الصغيرة/الموبايل (كروت متجاوبة) -->
+        @if (workers.length > 0) {
+        <div class="block md:hidden divide-y divide-gray-100">
+            @for (worker of workers; track worker._id; let i = $index) {
+            <div class="p-4 space-y-3 hover:bg-gray-50/50 transition">
+
+                <!-- الهيدر الخاص بالكارت: الاسم والتسلسل -->
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs font-semibold text-gray-400 bg-gray-100 px-2 py-0.5 rounded">
+                            #{{ (pagination.page - 1) * pagination.limit + i + 1 }}
+                        </span>
+                        <h3 class="font-bold text-gray-900 text-base">{{ worker.name }}</h3>
+                    </div>
+                    <span class="text-xs font-medium px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700">
+                        {{ worker.iqama_status || 'غير محدد' }}
+                    </span>
+                </div>
+
+                <!-- تفاصيل البيانات -->
+                <div class="grid grid-cols-2 gap-2 text-xs text-gray-600 pt-1">
+                    <div>
+                        <span class="text-gray-400 block mb-0.5">رقم الهوية:</span>
+                        <span class="font-medium text-gray-800">{{ worker.identity_number || '-' }}</span>
+                    </div>
+                    <div>
+                        <span class="text-gray-400 block mb-0.5">الجنسية:</span>
+                        <span class="font-medium text-gray-800">{{ worker.nationality || '-' }}</span>
+                    </div>
+                    <div>
+                        <span class="text-gray-400 block mb-0.5">المهنة:</span>
+                        <span class="font-medium text-gray-800">{{ worker.profession || '-' }}</span>
+                    </div>
+                    <div>
+                        <span class="text-gray-400 block mb-0.5">الكفيل:</span>
+                        <span class="font-medium text-gray-800 truncate block">{{ getEmployerName(worker) || '-'
+                            }}</span>
+                    </div>
+                </div>
+
+                <!-- أزرار الإجراءات للموبايل -->
+                <div class="flex items-center justify-end gap-2 pt-2 border-t border-gray-50">
+                    <a [routerLink]="['/workers', worker._id]"
+                        class="flex items-center gap-1 text-xs font-medium px-3 py-1.5 text-indigo-600 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition">
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                        التفاصيل
+                    </a>
+                    <a [routerLink]="['/workers', worker._id, 'edit']"
+                        class="flex items-center gap-1 text-xs font-medium px-3 py-1.5 text-amber-700 bg-amber-50 rounded-lg hover:bg-amber-100 transition">
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15.232 5.232l3.536 3.536M9 11l6.5-6.5a2 2 0 112.828 2.828L11.828 13.828A2 2 0 0110 14H8v-2a2 2 0 01.586-1.414z" />
+                        </svg>
+                        تعديل
+                    </a>
+                    <button (click)="deleteWorker(worker._id)" [disabled]="isDeleting === worker._id"
+                        class="flex items-center gap-1 text-xs font-medium px-3 py-1.5 text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition disabled:opacity-50">
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                        حذف
+                    </button>
+                </div>
+
+            </div>
+            }
+        </div>
+        }
+
+        }
 
         <!-- الترقيم والتنقل بين الصفحات (Pagination) -->
-        <div *ngIf="!isLoading && pagination.pages > 1"
-            class="flex flex-col sm:flex-row items-center justify-between gap-3 px-4 py-3 border-t border-gray-100">
+        @if (!isLoading && pagination.pages > 1) {
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-3 px-4 py-3 border-t border-gray-100">
             <p class="text-xs sm:text-sm text-gray-500 text-center sm:text-right">
                 صفحة <span class="font-medium text-gray-800">{{ pagination.page }}</span> من <span
                     class="font-medium text-gray-800">{{ pagination.pages }}</span>
@@ -210,11 +224,13 @@
 
                 <!-- إخفاء أرقام الصفحات الكثيرة في الموبايل وإظهارها فقط من شاشات sm وأكبر -->
                 <div class="hidden sm:flex items-center gap-1">
-                    <button *ngFor="let p of getPagesArray()" (click)="goToPage(p)"
-                        [class.bg-indigo-600]="p === pagination.page" [class.text-white]="p === pagination.page"
+                    @for (p of getPagesArray(); track p) {
+                    <button (click)="goToPage(p)" [class.bg-indigo-600]="p === pagination.page"
+                        [class.text-white]="p === pagination.page"
                         class="px-3 py-1.5 text-sm rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition">
                         {{ p }}
                     </button>
+                    }
                 </div>
 
                 <button (click)="goToPage(pagination.page + 1)" [disabled]="pagination.page === pagination.pages"
@@ -223,6 +239,7 @@
                 </button>
             </div>
         </div>
+        }
 
     </div>
 </div>

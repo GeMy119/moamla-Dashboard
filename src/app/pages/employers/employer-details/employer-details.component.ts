@@ -1,15 +1,15 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { EmployerService } from '../../../services/employer.service.ts.service';
 import { WorkerService } from '../../../services/worker.service';
 import { Employer } from '../../../models/employer.model.ts';
 import { Worker } from '../../../models/worker.model.ts';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-employer-details',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [RouterLink, DatePipe],
   templateUrl: './employer-details.component.html',
 })
 export class EmployerDetailsComponent implements OnInit {

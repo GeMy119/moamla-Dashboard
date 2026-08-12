@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { WorkerService } from '../../../services/worker.service';
 import { FamilyVisaService } from '../../../services/family-visa.service';
@@ -9,7 +8,7 @@ import { FamilyVisa } from '../../../models/family-visa.model.ts';
 @Component({
   selector: 'app-worker-details',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [RouterLink],
   templateUrl: './worker-details.component.html',
 })
 export class WorkerDetailsComponent implements OnInit {

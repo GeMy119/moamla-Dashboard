@@ -21,12 +21,13 @@
 
     <!-- Links -->
     <nav class="flex-1 px-3 py-1 space-y-1 overflow-y-auto">
-
-        <a *ngFor="let link of links" [routerLink]="link.path" routerLinkActive="bg-indigo-50 text-indigo-600"
+        @for (link of links; track $index) {
+        <a [routerLink]="link.path" routerLinkActive="bg-indigo-50 text-indigo-600"
             [routerLinkActiveOptions]="{ exact: true }" (click)="onLinkClick()"
             class="flex items-center gap-3 px-3 py-1 rounded-lg text-gray-600 hover:bg-gray-50 transition text-sm font-medium">
             {{ link.label }}
         </a>
+        }
     </nav>
 
     <!-- Footer -->

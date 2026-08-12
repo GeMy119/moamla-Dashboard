@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { NationalityRequestService } from '../../../services/nationality-request.service';
@@ -8,7 +7,7 @@ import { NationalityRequest } from '../../../models/nationality-request.model.ts
 @Component({
   selector: 'app-nationality-requests',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule],
+  imports: [RouterLink, FormsModule],
   templateUrl: './nationality-requests.component.html',
 })
 export class NationalityRequestsComponent implements OnInit {

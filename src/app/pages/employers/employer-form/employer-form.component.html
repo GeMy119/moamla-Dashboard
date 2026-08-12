@@ -18,19 +18,22 @@
         </div>
     </div>
 
+    <!-- Fetching Loader / Form Card -->
+    @if (isFetching) {
     <!-- Fetching Loader -->
-    <div *ngIf="isFetching" class="flex items-center justify-center py-20">
+    <div class="flex items-center justify-center py-20">
         <svg class="animate-spin h-7 w-7 text-indigo-600" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
         </svg>
     </div>
-
+    } @else {
     <!-- Form Card -->
-    <div *ngIf="!isFetching" class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+    <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
 
         <!-- Error -->
-        <div *ngIf="errorMessage"
+        @if (errorMessage) {
+        <div
             class="mb-5 bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg px-4 py-3 flex items-center gap-2">
             <svg class="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -38,6 +41,7 @@
             </svg>
             {{ errorMessage }}
         </div>
+        }
 
         <form (ngSubmit)="onSubmit()" class="grid grid-cols-1 md:grid-cols-2 gap-5">
 
@@ -97,15 +101,18 @@
                 </button>
                 <button type="submit" [disabled]="isLoading"
                     class="flex items-center gap-2 px-5 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 rounded-lg transition">
-                    <svg *ngIf="isLoading" class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                    @if (isLoading) {
+                    <svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
                         </circle>
                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
                     </svg>
+                    }
                     {{ isLoading ? 'جاري الحفظ...' : isEditMode ? 'حفظ التعديلات' : 'إضافة الكفيل' }}
                 </button>
             </div>
 
         </form>
     </div>
+    }
 </div>

@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FamilyVisaService } from '../../../services/family-visa.service';
@@ -10,7 +9,7 @@ import { Worker } from '../../../models/worker.model.ts';
 @Component({
   selector: 'app-family-visa-form',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
   templateUrl: './family-visa-form.component.html',
 })
 export class FamilyVisaFormComponent implements OnInit {

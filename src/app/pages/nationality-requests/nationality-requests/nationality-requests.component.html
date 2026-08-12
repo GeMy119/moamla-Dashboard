@@ -33,26 +33,29 @@
         </div>
     </div>
 
-    <div *ngIf="errorMessage" class="bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg px-4 py-3">
+    @if (errorMessage) {
+    <div class="bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg px-4 py-3">
         {{ errorMessage }}
     </div>
+    }
 
     <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
 
-        <div *ngIf="isLoading" class="flex items-center justify-center py-20">
+        @if (isLoading) {
+        <div class="flex items-center justify-center py-20">
             <svg class="animate-spin h-7 w-7 text-indigo-600" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
             </svg>
         </div>
-
+        } @else if (requests.length === 0) {
         <!-- لا يوجد طلبات -->
-        <div *ngIf="!isLoading && requests.length === 0" class="text-center py-16 text-gray-400">
+        <div class="text-center py-16 text-gray-400">
             <p class="text-sm">لا يوجد طلبات مسجلة</p>
         </div>
-
+        } @else {
         <!-- ✅ الجدول: يظهر بس من sm لفوق، مختفي تمامًا على الموبايل -->
-        <div *ngIf="!isLoading && requests.length > 0" class="hidden sm:block overflow-x-auto">
+        <div class="hidden sm:block overflow-x-auto">
             <table class="w-full text-sm text-right">
                 <thead class="bg-gray-50 border-b border-gray-100 text-gray-500 font-medium">
                     <tr>
@@ -69,13 +72,14 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-50">
-                    <tr *ngFor="let request of requests" class="hover:bg-gray-50 transition">
+                    @for (request of requests; track request._id) {
+                    <tr class="hover:bg-gray-50 transition">
                         <td class="px-4 py-3">
                             <img [src]="request.image_URL"
                                 class="w-10 h-10 rounded-lg object-cover border border-gray-100" />
                         </td>
                         <td class="px-4 py-3 font-medium text-gray-900">{{ request.name }}</td>
-                        <td class="px-4 py-3  text-gray-600">{{ request.identity_number }}</td>
+                        <td class="px-4 py-3 text-gray-600">{{ request.identity_number }}</td>
                         <td class="px-4 py-3 text-gray-600">{{ request.source_number }}</td>
                         <td class="px-4 py-3 text-gray-600">{{ request.application_number }}</td>
                         <td class="px-4 py-3 text-gray-600">{{ request.serial_number }}</td>
@@ -83,7 +87,7 @@
                         <td class="px-4 py-3 text-gray-600">{{ request.issue_date }}</td>
                         <td class="px-4 py-3">
                             <span class="inline-block text-xs font-medium px-2.5 py-1 rounded-full"
-                                [ngClass]="getStatusClass(request.status)">
+                                [class]="getStatusClass(request.status)">
                                 {{ request.status }}
                             </span>
                         </td>
@@ -108,13 +112,15 @@
                             </div>
                         </td>
                     </tr>
+                    }
                 </tbody>
             </table>
         </div>
 
         <!-- ✅ الكروت: تظهر بس على الموبايل، تحت sm -->
-        <div *ngIf="!isLoading && requests.length > 0" class="sm:hidden divide-y divide-gray-50">
-            <div *ngFor="let request of requests" class="p-3">
+        <div class="sm:hidden divide-y divide-gray-50">
+            @for (request of requests; track request._id) {
+            <div class="p-3">
                 <div class="flex items-start gap-3 mb-3">
                     <img [src]="request.image_URL"
                         class="w-12 h-12 rounded-lg object-cover border border-gray-100 shrink-0" />
@@ -123,7 +129,7 @@
                             <p class="font-medium text-gray-900 text-sm truncate">{{ request.name }}</p>
                             <span
                                 class="inline-block text-[10px] font-medium px-2 py-0.5 rounded-full whitespace-nowrap shrink-0"
-                                [ngClass]="getStatusClass(request.status)">
+                                [class]="getStatusClass(request.status)">
                                 {{ request.status }}
                             </span>
                         </div>
@@ -173,9 +179,12 @@
                     </button>
                 </div>
             </div>
+            }
         </div>
+        }
 
-        <div *ngIf="!isLoading && pagination.pages > 1"
+        @if (!isLoading && pagination.pages > 1) {
+        <div
             class="flex flex-col sm:flex-row items-center justify-between gap-2 px-3 sm:px-4 py-3 border-t border-gray-100">
             <p class="text-xs sm:text-sm text-gray-500">صفحة {{ pagination.page }} من {{ pagination.pages }}</p>
             <div class="flex items-center gap-1 flex-wrap justify-center">
@@ -183,16 +192,19 @@
                     class="px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 transition">
                     السابق
                 </button>
-                <button *ngFor="let p of getPagesArray()" (click)="goToPage(p)"
-                    [class.bg-indigo-600]="p === pagination.page" [class.text-white]="p === pagination.page"
+                @for (p of getPagesArray(); track p) {
+                <button (click)="goToPage(p)" [class.bg-indigo-600]="p === pagination.page"
+                    [class.text-white]="p === pagination.page"
                     class="px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition">
                     {{ p }}
                 </button>
+                }
                 <button (click)="goToPage(pagination.page + 1)" [disabled]="pagination.page === pagination.pages"
                     class="px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 transition">
                     التالي
                 </button>
             </div>
         </div>
+        }
     </div>
 </div>

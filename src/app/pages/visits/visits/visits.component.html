@@ -29,27 +29,30 @@
             </button>
         </div>
     </div>
-
-    <div *ngIf="errorMessage" class="bg-red-50 border border-red-200 text-red-600 text-xs rounded-md px-3 py-2">
+    @if(errorMessage){
+    <div class="bg-red-50 border border-red-200 text-red-600 text-xs rounded-md px-3 py-2">
         {{ errorMessage }}
     </div>
+    }
 
     <div class="bg-white rounded-lg border border-gray-100 shadow-sm overflow-hidden">
-
-        <div *ngIf="isLoading" class="flex items-center justify-center py-12">
+        @if (isLoading) {
+        <div class="flex items-center justify-center py-12">
             <svg class="animate-spin h-6 w-6 text-indigo-600" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
             </svg>
         </div>
-
+        }
         <!-- لا يوجد تأشيرات -->
-        <div *ngIf="!isLoading && visits.length === 0" class="text-center py-10 text-gray-400 text-xs">
+        @if(!isLoading && visits.length === 0) {
+        <div class="text-center py-10 text-gray-400 text-xs">
             لا يوجد تأشيرات مسجلة
         </div>
-
+        }
         <!-- ✅ الجدول: يظهر بس من sm لفوق -->
-        <div *ngIf="!isLoading && visits.length > 0" class="hidden sm:block overflow-x-auto">
+        @if(!isLoading && visits.length > 0){
+        <div class="hidden sm:block overflow-x-auto">
             <table class="w-full text-[11px] text-right border-collapse">
                 <thead class="bg-gray-50 border-b border-gray-100 text-gray-500 font-bold uppercase whitespace-nowrap">
                     <tr>
@@ -66,7 +69,8 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100">
-                    <tr *ngFor="let visit of visits" class="hover:bg-gray-50/80 transition">
+                    @for (visit of visits; track $index) {
+                    <tr class="hover:bg-gray-50/80 transition">
                         <td class="px-2 py-1">
                             <img [src]="visit.image_url"
                                 class="w-7 h-7 rounded-md object-cover border border-gray-100" />
@@ -102,13 +106,17 @@
                             </div>
                         </td>
                     </tr>
+                    }
                 </tbody>
             </table>
         </div>
+        }
 
         <!-- ✅ الكروت: تظهر بس على الموبايل، تحت sm -->
-        <div *ngIf="!isLoading && visits.length > 0" class="sm:hidden divide-y divide-gray-100">
-            <div *ngFor="let visit of visits" class="p-3">
+        @if(!isLoading && visits.length > 0){
+        <div class="sm:hidden divide-y divide-gray-100">
+            @for (visit of visits; track $index) {
+            <div class="p-3">
                 <div class="flex items-start gap-2.5 mb-2.5">
                     <img [src]="visit.image_url"
                         class="w-10 h-10 rounded-md object-cover border border-gray-100 shrink-0" />
@@ -166,26 +174,30 @@
                     </button>
                 </div>
             </div>
+            }
         </div>
-
-        <div *ngIf="!isLoading && pagination.pages > 1"
-            class="flex flex-col sm:flex-row items-center justify-between gap-2 px-3 py-2 border-t border-gray-100">
+        }
+        @if(!isLoading && pagination.pages > 1){
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-2 px-3 py-2 border-t border-gray-100">
             <p class="text-[11px] text-gray-500">صفحة {{ pagination.page }} من {{ pagination.pages }}</p>
             <div class="flex items-center gap-1 flex-wrap justify-center">
                 <button (click)="goToPage(pagination.page - 1)" [disabled]="pagination.page === 1"
                     class="px-2 py-0.5 text-[11px] rounded border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 transition">
                     السابق
                 </button>
-                <button *ngFor="let p of getPagesArray()" (click)="goToPage(p)"
-                    [class.bg-indigo-600]="p === pagination.page" [class.text-white]="p === pagination.page"
+                @for (p of getPagesArray(); track $index) {
+                <button (click)="goToPage(p)" [class.bg-indigo-600]="p === pagination.page"
+                    [class.text-white]="p === pagination.page"
                     class="px-2 py-0.5 text-[11px] rounded border border-gray-200 text-gray-600 hover:bg-gray-50 transition">
                     {{ p }}
                 </button>
+                }
                 <button (click)="goToPage(pagination.page + 1)" [disabled]="pagination.page === pagination.pages"
                     class="px-2 py-0.5 text-[11px] rounded border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 transition">
                     التالي
                 </button>
             </div>
         </div>
+        }
     </div>
 </div>

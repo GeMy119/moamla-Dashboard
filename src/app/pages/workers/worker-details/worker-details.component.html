@@ -12,19 +12,23 @@
             <p class="text-xs sm:text-sm text-gray-500 mt-0.5 truncate">{{ worker?.name }}</p>
         </div>
     </div>
-
-    <div *ngIf="isLoading" class="flex items-center justify-center py-20">
+    @if (isLoading) {
+    <div class="flex items-center justify-center py-20">
         <svg class="animate-spin h-7 w-7 text-indigo-600" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
         </svg>
     </div>
-
-    <div *ngIf="errorMessage" class="bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg px-4 py-3">
+    }
+    @if (errorMessage) {
+    <div class="bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg px-4 py-3">
         {{ errorMessage }}
     </div>
+    }
+    @if(!isLoading && worker){
 
-    <div *ngIf="!isLoading && worker">
+
+    <div>
 
         <!-- البيانات الأساسية -->
         <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-3 sm:p-6 mb-5">
@@ -47,11 +51,13 @@
                 </div>
                 <div class="bg-gray-50 rounded-lg p-2 sm:p-3 min-w-0">
                     <p class="text-[10px] sm:text-xs text-gray-500 mb-1">رقم الهوية</p>
-                    <p class="text-xs sm:text-sm font-medium text-gray-900 break-words">{{ worker.identity_number }}</p>
+                    <p class="text-xs sm:text-sm font-medium text-gray-900 break-words">{{ worker.identity_number }}
+                    </p>
                 </div>
                 <div class="bg-gray-50 rounded-lg p-2 sm:p-3 min-w-0">
                     <p class="text-[10px] sm:text-xs text-gray-500 mb-1">رقم الصادر</p>
-                    <p class="text-xs sm:text-sm font-medium text-gray-900 break-words">{{ worker.source_number }}</p>
+                    <p class="text-xs sm:text-sm font-medium text-gray-900 break-words">{{ worker.source_number }}
+                    </p>
                 </div>
                 <div class="bg-gray-50 rounded-lg p-2 sm:p-3 min-w-0">
                     <p class="text-[10px] sm:text-xs text-gray-500 mb-1">الجنسية</p>
@@ -67,25 +73,30 @@
                 </div>
                 <div class="bg-gray-50 rounded-lg p-2 sm:p-3 min-w-0">
                     <p class="text-[10px] sm:text-xs text-gray-500 mb-1">رقم الإقامة</p>
-                    <p class="text-xs sm:text-sm font-medium text-gray-900 break-words">{{ worker.iqama_number }}</p>
+                    <p class="text-xs sm:text-sm font-medium text-gray-900 break-words">{{ worker.iqama_number }}
+                    </p>
                 </div>
                 <div class="bg-gray-50 rounded-lg p-2 sm:p-3 min-w-0">
                     <p class="text-[10px] sm:text-xs text-gray-500 mb-1">تاريخ إصدار الإقامة</p>
-                    <p class="text-xs sm:text-sm font-medium text-gray-900 break-words">{{ worker.iqama_issue_date }}
+                    <p class="text-xs sm:text-sm font-medium text-gray-900 break-words">{{ worker.iqama_issue_date
+                        }}
                     </p>
                 </div>
                 <div class="bg-gray-50 rounded-lg p-2 sm:p-3 min-w-0">
                     <p class="text-[10px] sm:text-xs text-gray-500 mb-1">تاريخ انتهاء الإقامة</p>
-                    <p class="text-xs sm:text-sm font-medium text-gray-900 break-words">{{ worker.iqama_expiry_date }}
+                    <p class="text-xs sm:text-sm font-medium text-gray-900 break-words">{{ worker.iqama_expiry_date
+                        }}
                     </p>
                 </div>
                 <div class="bg-gray-50 rounded-lg p-2 sm:p-3 min-w-0">
                     <p class="text-[10px] sm:text-xs text-gray-500 mb-1">حالة الإقامة</p>
-                    <p class="text-xs sm:text-sm font-medium text-gray-900 break-words">{{ worker.iqama_status }}</p>
+                    <p class="text-xs sm:text-sm font-medium text-gray-900 break-words">{{ worker.iqama_status }}
+                    </p>
                 </div>
                 <div class="bg-gray-50 rounded-lg p-2 sm:p-3 min-w-0">
                     <p class="text-[10px] sm:text-xs text-gray-500 mb-1">رقم الحساب</p>
-                    <p class="text-xs sm:text-sm font-medium text-gray-900 break-words">{{ worker.account_number }}</p>
+                    <p class="text-xs sm:text-sm font-medium text-gray-900 break-words">{{ worker.account_number }}
+                    </p>
                 </div>
                 <div class="bg-gray-50 rounded-lg p-2 sm:p-3 min-w-0">
                     <p class="text-[10px] sm:text-xs text-gray-500 mb-1">العنوان</p>
@@ -126,7 +137,8 @@
             </div>
 
             <!-- Tab: التأشيرات العائلية -->
-            <div *ngIf="activeTab === 'family_visas'" class="p-3 sm:p-5">
+            @if(activeTab === 'family_visas') {
+            <div class="p-3 sm:p-5">
                 <div class="flex items-center justify-between gap-2 mb-4">
                     <h3 class="font-medium text-gray-900 text-sm sm:text-base">التأشيرات العائلية</h3>
                     <a [routerLink]="['/workers', worker._id, 'family-visas', 'add']"
@@ -138,26 +150,33 @@
                         إضافة تأشيرة
                     </a>
                 </div>
-
-                <div *ngIf="familyVisasErrorMessage"
-                    class="bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg px-4 py-3 mb-4">
+                @if(familyVisasErrorMessage){
+                <div class="bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg px-4 py-3 mb-4">
                     {{ familyVisasErrorMessage }}
                 </div>
+                }
+                @if(isLoadingFamilyVisas){
 
-                <div *ngIf="isLoadingFamilyVisas" class="flex items-center justify-center py-16">
+                <div class="flex items-center justify-center py-16">
                     <svg class="animate-spin h-7 w-7 text-indigo-600" fill="none" viewBox="0 0 24 24">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
                         </circle>
                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
                     </svg>
                 </div>
+                }
+                @if(!isLoadingFamilyVisas && familyVisas.length === 0){
 
-                <div *ngIf="!isLoadingFamilyVisas && familyVisas.length === 0" class="text-center py-12 text-gray-400">
+
+                <div class="text-center py-12 text-gray-400">
                     <p class="text-sm">لا يوجد تأشيرات عائلية مسجلة</p>
                 </div>
+                }
+                @if(!isLoadingFamilyVisas && familyVisas.length > 0){
 
-                <div *ngIf="!isLoadingFamilyVisas && familyVisas.length > 0" class="space-y-3">
-                    <div *ngFor="let visa of familyVisas" class="bg-gray-50 rounded-lg p-3 sm:p-4">
+                <div class="space-y-3">
+                    @for (visa of familyVisas; track $index) {
+                    <div class="bg-gray-50 rounded-lg p-3 sm:p-4">
                         <div class="flex items-center justify-between gap-2 mb-3">
                             <h4 class="font-medium text-gray-900 text-sm sm:text-base min-w-0 truncate">{{
                                 visa.visitor_name }}</h4>
@@ -186,12 +205,14 @@
                         <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
                             <div class="min-w-0">
                                 <p class="text-[10px] sm:text-xs text-gray-500 mb-1">صلة القرابة</p>
-                                <p class="text-xs sm:text-sm font-medium text-gray-900 break-words">{{ visa.relation }}
+                                <p class="text-xs sm:text-sm font-medium text-gray-900 break-words">{{ visa.relation
+                                    }}
                                 </p>
                             </div>
                             <div class="min-w-0">
                                 <p class="text-[10px] sm:text-xs text-gray-500 mb-1">الجنسية</p>
-                                <p class="text-xs sm:text-sm font-medium text-gray-900 break-words">{{ visa.nationality
+                                <p class="text-xs sm:text-sm font-medium text-gray-900 break-words">{{
+                                    visa.nationality
                                     }}</p>
                             </div>
                             <div class="min-w-0">
@@ -213,27 +234,35 @@
                             </div>
                             <div class="min-w-0">
                                 <p class="text-[10px] sm:text-xs text-gray-500 mb-1">مدة الإقامة</p>
-                                <p class="text-xs sm:text-sm font-medium text-gray-900">{{ visa.duration_days }} يوم</p>
+                                <p class="text-xs sm:text-sm font-medium text-gray-900">{{ visa.duration_days }} يوم
+                                </p>
                             </div>
                             <div class="min-w-0">
                                 <p class="text-[10px] sm:text-xs text-gray-500 mb-1">تاريخ الإصدار</p>
-                                <p class="text-xs sm:text-sm font-medium text-gray-900 break-words">{{ visa.releaseDate
+                                <p class="text-xs sm:text-sm font-medium text-gray-900 break-words">{{
+                                    visa.releaseDate
                                     }}</p>
                             </div>
-                            <div *ngIf="visa.status" class="min-w-0">
+                            @if(visa.status){
+                            <div class="min-w-0">
                                 <p class="text-[10px] sm:text-xs text-gray-500 mb-1">الحالة</p>
                                 <p class="text-xs sm:text-sm font-medium text-gray-900 break-words">{{
                                     getStatusLablel(visa.status) }}</p>
                             </div>
+                            }
                         </div>
                     </div>
+                    }
                 </div>
+                }
             </div>
+            }
 
             <!-- Tab: البلاغات -->
-            <div *ngIf="activeTab === 'alerts'" class="p-3 sm:p-5">
-
-                <div *ngIf="!worker.alerts?.type" class="text-center py-10 text-gray-400">
+            @if(activeTab === 'alerts'){
+            <div class="p-3 sm:p-5">
+                @if(!worker.alerts?.type){
+                <div class="text-center py-10 text-gray-400">
                     <p class="text-sm mb-4">لا يوجد بلاغ مسجل</p>
                     <a [routerLink]="['/workers', worker._id, 'alerts', 'add']"
                         class="inline-flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition">
@@ -243,8 +272,9 @@
                         إضافة بلاغ
                     </a>
                 </div>
-
-                <div *ngIf="worker.alerts?.type">
+                }
+                @if(worker.alerts?.type){
+                <div>
                     <div class="flex items-center justify-between gap-2 mb-4">
                         <h3 class="font-medium text-gray-900 text-sm sm:text-base">بيانات البلاغ</h3>
                         <div class="flex items-center gap-2 sm:gap-3 shrink-0">
@@ -258,14 +288,15 @@
                     <div class="grid grid-cols-2 gap-2 sm:gap-4">
                         <div class="bg-gray-50 rounded-lg p-2 sm:p-3 min-w-0">
                             <p class="text-[10px] sm:text-xs text-gray-500 mb-1">نوع البلاغ</p>
-                            <p class="text-xs sm:text-sm font-medium text-gray-900 break-words">{{ worker.alerts!.type
+                            <p class="text-xs sm:text-sm font-medium text-gray-900 break-words">{{
+                                worker.alerts!.type
                                 }}</p>
                         </div>
                         <div class="bg-gray-50 rounded-lg p-2 sm:p-3 min-w-0">
                             <p class="text-[10px] sm:text-xs text-gray-500 mb-1">الحالة</p>
                             <span
                                 class="inline-block text-[10px] sm:text-xs font-medium px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full"
-                                [ngClass]="getAlertStatusClass(worker.alerts!.status)">
+                                [class]="getAlertStatusClass(worker.alerts!.status)">
                                 {{ getAlertStatusLabel(worker.alerts!.status) }}
                             </span>
                         </div>
@@ -286,12 +317,15 @@
                         </div>
                     </div>
                 </div>
+                }
             </div>
-
+            }
             <!-- Tab: تعديل المهنة -->
-            <div *ngIf="activeTab === 'profession_changes'" class="p-3 sm:p-5">
+            @if(activeTab === 'profession_changes'){
+            <div class="p-3 sm:p-5">
+                @if(!worker.profession_changes?.change_date){
 
-                <div *ngIf="!worker.profession_changes?.change_date" class="text-center py-10 text-gray-400">
+                <div class="text-center py-10 text-gray-400">
                     <p class="text-sm mb-4">لا يوجد تعديل مهنة مسجل</p>
                     <a [routerLink]="['/workers', worker._id, 'profession-change', 'add']"
                         class="inline-flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition">
@@ -301,8 +335,10 @@
                         تسجيل تعديل مهنة
                     </a>
                 </div>
+                }
+                @if(worker.profession_changes?.change_date){
 
-                <div *ngIf="worker.profession_changes?.change_date">
+                <div>
                     <div class="flex items-center justify-between gap-2 mb-4">
                         <h3 class="font-medium text-gray-900 text-sm sm:text-base">آخر تعديل مهنة</h3>
                         <div class="flex items-center gap-2 sm:gap-3 shrink-0">
@@ -321,14 +357,15 @@
                         </div>
                         <div class="bg-gray-50 rounded-lg p-2 sm:p-3 min-w-0">
                             <p class="text-[10px] sm:text-xs text-gray-500 mb-1">المهنة الحالية</p>
-                            <p class="text-xs sm:text-sm font-medium text-gray-900 break-words">{{ worker.profession }}
+                            <p class="text-xs sm:text-sm font-medium text-gray-900 break-words">{{ worker.profession
+                                }}
                             </p>
                         </div>
                         <div class="bg-gray-50 rounded-lg p-2 sm:p-3 min-w-0">
                             <p class="text-[10px] sm:text-xs text-gray-500 mb-1">الحالة</p>
                             <span
                                 class="inline-block text-[10px] sm:text-xs font-medium px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full"
-                                [ngClass]="getAlertStatusClass(worker.profession_changes!.status)">
+                                [class]="getAlertStatusClass(worker.profession_changes!.status)">
                                 {{ getAlertStatusLabel(worker.profession_changes!.status) }}
                             </span>
                         </div>
@@ -346,10 +383,12 @@
                         </div>
                     </div>
                 </div>
+                }
             </div>
-
+            }
             <!-- Tab: أنواع المعاملات -->
-            <div *ngIf="activeTab === 'moamla_type'" class="p-3 sm:p-5">
+            @if(activeTab === 'moamla_type'){
+            <div class="p-3 sm:p-5">
                 <div class="flex items-center justify-between gap-2 mb-4">
                     <h3 class="font-medium text-gray-900 text-sm sm:text-base">الأستعلام العام عن المعاملات</h3>
                     <a [routerLink]="['/workers', worker._id, 'moamla-type', 'add']"
@@ -362,22 +401,25 @@
                     </a>
                 </div>
 
-                <div *ngIf="moamlaTypesErrorMessage"
-                    class="bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg px-4 py-3 mb-4">
+                @if(moamlaTypesErrorMessage){
+                <div class="bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg px-4 py-3 mb-4">
                     {{ moamlaTypesErrorMessage }}
                 </div>
-
-                <div *ngIf="!worker.moamla_type || worker.moamla_type.length === 0"
-                    class="text-center py-12 text-gray-400">
+                }
+                @if(!worker.moamla_type || worker.moamla_type.length === 0){
+                <div class="text-center py-12 text-gray-400">
                     <p class="text-sm">لا يوجد أنواع معاملات مسجلة</p>
                 </div>
-
-                <div *ngIf="worker.moamla_type && worker.moamla_type.length > 0" class="space-y-3">
-                    <div *ngFor="let moamla of worker.moamla_type" class="bg-gray-50 rounded-lg p-3 sm:p-4">
+                }
+                @if(worker.moamla_type && worker.moamla_type.length > 0){
+                <div class="space-y-3">
+                    @for (moamla of worker.moamla_type; track $index) {
+                    <div class="bg-gray-50 rounded-lg p-3 sm:p-4">
                         <div class="flex items-center justify-between gap-2">
                             <div class="min-w-0">
                                 <p class="text-[10px] sm:text-xs text-gray-500 mb-1">نوع المعاملة</p>
-                                <p class="text-xs sm:text-sm font-medium text-gray-900 break-words">{{ moamla.name }}
+                                <p class="text-xs sm:text-sm font-medium text-gray-900 break-words">{{ moamla.name
+                                    }}
                                 </p>
                             </div>
                             <div class="min-w-0">
@@ -389,7 +431,7 @@
                             <div class="flex items-center gap-1.5 sm:gap-3 shrink-0">
                                 <span
                                     class="inline-block text-[10px] sm:text-xs font-medium px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full whitespace-nowrap"
-                                    [ngClass]="getAlertStatusClass(moamla.status)">
+                                    [class]="getAlertStatusClass(moamla.status)">
                                     {{ getAlertStatusLabel(moamla.status) }}
                                 </span>
                                 <a [routerLink]="['/workers', worker._id, 'moamla-type', moamla._id, 'edit']"
@@ -414,9 +456,12 @@
                             </div>
                         </div>
                     </div>
+                    }
                 </div>
+                }
             </div>
-
+            }
         </div>
     </div>
+    }
 </div>

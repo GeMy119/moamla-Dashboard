@@ -3,11 +3,10 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Employer, MarriagePermitDto } from '../../../models/employer.model.ts';
 import { EmployerService } from '../../../services/employer.service.ts.service';
 import { FormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
 
 
 @Component({
-  imports: [FormsModule, CommonModule],
+  imports: [FormsModule],
   selector: 'app-marriage-permit-form',
   templateUrl: './marriage-permit-form.component.html'
 })

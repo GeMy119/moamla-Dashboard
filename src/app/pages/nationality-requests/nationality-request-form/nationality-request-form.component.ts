@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NationalityRequestService } from '../../../services/nationality-request.service';
@@ -8,7 +7,7 @@ import { CreateNationalityRequestDto } from '../../../models/nationality-request
 @Component({
   selector: 'app-nationality-request-form',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
   templateUrl: './nationality-request-form.component.html',
 })
 export class NationalityRequestFormComponent implements OnInit {

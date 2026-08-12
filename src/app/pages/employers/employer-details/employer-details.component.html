@@ -13,21 +13,25 @@
             <p class="text-xs sm:text-sm text-gray-500 mt-0.5 truncate">{{ employer?.name }}</p>
         </div>
     </div>
-
+    @if(isLoading){
     <!-- Loading -->
-    <div *ngIf="isLoading" class="flex items-center justify-center py-20">
+    <div class="flex items-center justify-center py-20">
         <svg class="animate-spin h-7 w-7 text-indigo-600" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
         </svg>
     </div>
+    }
+
 
     <!-- Error -->
-    <div *ngIf="errorMessage" class="bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg px-4 py-3">
+    @if(errorMessage){
+    <div class="bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg px-4 py-3">
         {{ errorMessage }}
     </div>
-
-    <div *ngIf="!isLoading && employer">
+    }
+    @if(!isLoading && employer){
+    <div>
 
         <!-- بيانات الكفيل -->
         <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-3 sm:p-6 mb-5">
@@ -129,7 +133,8 @@
             </div>
 
             <!-- Tab: العمال -->
-            <div *ngIf="activeTab === 'workers'" class="p-3 sm:p-5">
+            @if(activeTab === 'workers'){
+            <div class="p-3 sm:p-5">
                 <div class="flex items-center justify-between gap-2 mb-4">
                     <h3 class="font-medium text-gray-900 text-sm sm:text-base">قائمة العمال</h3>
 
@@ -145,22 +150,27 @@
                 </div>
 
                 <!-- Error -->
-                <div *ngIf="workersErrorMessage"
-                    class="bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg px-4 py-3 mb-4">
+                @if(workersErrorMessage){
+                <div class="bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg px-4 py-3 mb-4">
                     {{ workersErrorMessage }}
                 </div>
+                }
+
 
                 <!-- Loading -->
-                <div *ngIf="isLoadingWorkers" class="flex items-center justify-center py-16">
+                @if(isLoadingWorkers){
+                <div class="flex items-center justify-center py-16">
                     <svg class="animate-spin h-7 w-7 text-indigo-600" fill="none" viewBox="0 0 24 24">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
                         </circle>
                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
                     </svg>
                 </div>
+                }
 
                 <!-- مفيش عمال -->
-                <div *ngIf="!isLoadingWorkers && workers.length === 0" class="text-center py-12 text-gray-400">
+                @if(!isLoadingWorkers && workers.length === 0){
+                <div class="text-center py-12 text-gray-400">
                     <svg class="w-10 h-10 mx-auto mb-3 text-gray-300" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
@@ -168,9 +178,11 @@
                     </svg>
                     <p class="text-sm">لا يوجد عمال مسجلون لهذا الكفيل</p>
                 </div>
+                }
 
                 <!-- ✅ نسخة الجدول (من sm لفوق بس) -->
-                <div *ngIf="!isLoadingWorkers && workers.length > 0" class="hidden sm:block overflow-x-auto">
+                @if(!isLoadingWorkers && workers.length > 0){
+                <div class="hidden sm:block overflow-x-auto">
                     <table class="w-full text-sm text-right">
                         <thead class="bg-gray-50 border-b border-gray-100 text-gray-500 font-medium">
                             <tr>
@@ -185,8 +197,9 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-50">
-                            <tr *ngFor="let worker of workers; let i = index" class="hover:bg-gray-50 transition">
-                                <td class="px-4 py-3 text-gray-400">{{ i + 1 }}</td>
+                            @for (worker of workers; track $index) {
+                            <tr class="hover:bg-gray-50 transition">
+                                <td class="px-4 py-3 text-gray-400">{{ $index + 1 }}</td>
                                 <td class="px-4 py-3 font-medium text-gray-900">{{ worker.name }}</td>
                                 <td class="px-4 py-3 text-gray-600">{{ worker.identity_number }}</td>
                                 <td class="px-4 py-3 text-gray-600">{{ worker.source_number }}</td>
@@ -194,7 +207,7 @@
                                 <td class="px-4 py-3 text-gray-600">{{ worker.profession }}</td>
                                 <td class="px-4 py-3">
                                     <span class="inline-block text-xs font-medium px-2.5 py-1 rounded-full"
-                                        [ngClass]="getIqamaStatusClass(worker.iqama_status)">
+                                        [class]="getIqamaStatusClass(worker.iqama_status)">
                                         {{ worker.iqama_status }}
                                     </span>
                                 </td>
@@ -230,19 +243,22 @@
                                     </div>
                                 </td>
                             </tr>
+                            }
                         </tbody>
                     </table>
                 </div>
+                }
 
                 <!-- ✅ نسخة الكروت (على الموبايل بس، تحت sm) -->
-                <div *ngIf="!isLoadingWorkers && workers.length > 0" class="sm:hidden space-y-3">
-                    <div *ngFor="let worker of workers; let i = index"
-                        class="bg-gray-50 rounded-lg p-3 border border-gray-100">
+                @if(!isLoadingWorkers && workers.length > 0){
+                <div class="sm:hidden space-y-3">
+                    @for (worker of workers; track $index) {
+                    <div class="bg-gray-50 rounded-lg p-3 border border-gray-100">
                         <div class="flex items-center justify-between gap-2 mb-2">
                             <p class="font-medium text-gray-900 text-sm truncate">{{ worker.name }}</p>
                             <span
                                 class="inline-block text-[10px] font-medium px-2 py-0.5 rounded-full whitespace-nowrap shrink-0"
-                                [ngClass]="getIqamaStatusClass(worker.iqama_status)">
+                                [class]="getIqamaStatusClass(worker.iqama_status)">
                                 {{ worker.iqama_status }}
                             </span>
                         </div>
@@ -297,14 +313,19 @@
                             </button>
                         </div>
                     </div>
+                    }
                 </div>
+                }
             </div>
+            }
 
             <!-- Tab: تصريح الزواج -->
-            <div *ngIf="activeTab === 'marriage_permit'" class="p-3 sm:p-5">
+            @if(activeTab === 'marriage_permit'){
+            <div class="p-3 sm:p-5">
 
                 <!-- مفيش تصريح -->
-                <div *ngIf="!employer.marriage_permit?.status">
+                @if(!employer.marriage_permit?.status){
+                <div>
                     <div class="text-center py-10 text-gray-400">
                         <svg class="w-10 h-10 mx-auto mb-3 text-gray-300" fill="none" viewBox="0 0 24 24"
                             stroke="currentColor">
@@ -323,9 +344,11 @@
                         </a>
                     </div>
                 </div>
+                }
 
                 <!-- فيه تصريح -->
-                <div *ngIf="employer.marriage_permit?.status">
+                @if(employer.marriage_permit?.status){
+                <div>
                     <div class="flex items-center justify-between gap-2 mb-4">
                         <h3 class="font-medium text-gray-900 text-sm sm:text-base">بيانات تصريح الزواج</h3>
 
@@ -346,7 +369,7 @@
                             <p class="text-[10px] sm:text-xs text-gray-500 mb-1">الحالة</p>
                             <span
                                 class="inline-block text-[10px] sm:text-xs font-medium px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full"
-                                [ngClass]="getMarriagePermitStatusClass(employer.marriage_permit!.status)">
+                                [class]="getMarriagePermitStatusClass(employer.marriage_permit!.status)">
                                 {{ getMarriagePermitStatusLabel(employer.marriage_permit!.status) }}
                             </span>
                         </div>
@@ -413,9 +436,12 @@
 
                     </div>
                 </div>
+                }
             </div>
+            }
             <!-- Tab: مراجعة تذاكر التأشيرات -->
-            <div *ngIf="activeTab === 'ticket_visa_review'" class="p-3 sm:p-5">
+            @if(activeTab === 'ticket_visa_review'){
+            <div class="p-3 sm:p-5">
                 <div class="flex items-center justify-between gap-2 mb-4">
                     <h3 class="font-medium text-gray-900 text-sm sm:text-base">ملفات العمالة</h3>
 
@@ -430,8 +456,10 @@
                 </div>
 
                 <!-- مفيش مراجعات -->
-                <div *ngIf="!employer.ticket_visa_review || employer.ticket_visa_review.length === 0"
-                    class="text-center py-12 text-gray-400">
+                @if(!employer.ticket_visa_review || employer.ticket_visa_review.length === 0){
+
+
+                <div class="text-center py-12 text-gray-400">
                     <svg class="w-10 h-10 mx-auto mb-3 text-gray-300" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
@@ -439,11 +467,13 @@
                     </svg>
                     <p class="text-sm">لا يوجد مراجعات تأشيرات مسجلة</p>
                 </div>
+                }
 
                 <!-- قائمة المراجعات -->
-                <div *ngIf="employer.ticket_visa_review && employer.ticket_visa_review.length > 0" class="space-y-3">
-                    <div *ngFor="let review of employer.ticket_visa_review"
-                        class="bg-gray-50 rounded-lg p-3 sm:p-4 flex items-center justify-between gap-2">
+                @if(employer.ticket_visa_review && employer.ticket_visa_review.length > 0){
+                <div class="space-y-3">
+                    @for (review of employer.ticket_visa_review; track $index) {
+                    <div class="bg-gray-50 rounded-lg p-3 sm:p-4 flex items-center justify-between gap-2">
                         <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 flex-1 min-w-0">
                             <div class="min-w-0">
                                 <p class="text-[10px] sm:text-xs text-gray-500 mb-1">الجنسية</p>
@@ -487,9 +517,13 @@
                             </button>
                         </div>
                     </div>
+                    }
                 </div>
+                }
             </div>
+            }
 
         </div>
     </div>
+    }
 </div>

@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CreateEmployerDto } from '../../../models/employer.model.ts';
@@ -8,7 +7,7 @@ import { EmployerService } from '../../../services/employer.service.ts.service';
 @Component({
   selector: 'app-employer-form',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
   templateUrl: './employer-form.component.html',
 })
 export class EmployerFormComponent implements OnInit {

@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { EmployerService } from '../../../services/employer.service.ts.service';
@@ -8,7 +7,7 @@ import { Employer, ticket } from '../../../models/employer.model.ts';
 @Component({
   selector: 'app-ticket-visa-review-form',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
   templateUrl: './ticket-visa-review-form.component.html',
 })
 export class TicketVisaReviewFormComponent implements OnInit {

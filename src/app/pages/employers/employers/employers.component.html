@@ -17,32 +17,35 @@
     </div>
 
     <!-- Error -->
-    <div *ngIf="errorMessage" class="bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg px-4 py-3">
+    @if (errorMessage) {
+    <div class="bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg px-4 py-3">
         {{ errorMessage }}
     </div>
+    }
 
     <!-- Card -->
     <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
 
         <!-- Loading -->
-        <div *ngIf="isLoading" class="flex items-center justify-center py-20">
+        @if (isLoading) {
+        <div class="flex items-center justify-center py-20">
             <svg class="animate-spin h-7 w-7 text-indigo-600" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
             </svg>
         </div>
-
-        <!-- Empty State (مشترك بين الجدول والكروت) -->
-        <div *ngIf="!isLoading && employers.length === 0" class="text-center py-16 text-gray-400">
+        } @else if (employers.length === 0) {
+        <!-- Empty State -->
+        <div class="text-center py-16 text-gray-400">
             <svg class="w-10 h-10 mx-auto mb-3 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                     d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m6-5.13a4 4 0 11-8 0 4 4 0 018 0zm6 3a4 4 0 10-8 0" />
             </svg>
             لا يوجد كفلاء سعوديون مسجلون
         </div>
-
+        } @else {
         <!-- ============ نسخة الجدول: من md فأكبر ============ -->
-        <div *ngIf="!isLoading && employers.length > 0" class="hidden md:block overflow-x-auto">
+        <div class="hidden md:block overflow-x-auto">
             <table class="w-full text-sm text-right">
                 <thead class="bg-gray-50 border-b border-gray-100 text-gray-500 font-medium">
                     <tr>
@@ -57,7 +60,8 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-50">
-                    <tr *ngFor="let employer of employers; let i = index" class="hover:bg-gray-50 transition">
+                    @for (employer of employers; track employer._id; let i = $index) {
+                    <tr class="hover:bg-gray-50 transition">
                         <td class="px-4 py-3 text-gray-400">
                             {{ (pagination.page - 1) * pagination.limit + i + 1 }}
                         </td>
@@ -98,14 +102,15 @@
                             </div>
                         </td>
                     </tr>
+                    }
                 </tbody>
             </table>
         </div>
 
         <!-- ============ نسخة الكروت: على الموبايل فقط ============ -->
-        <div *ngIf="!isLoading && employers.length > 0" class="md:hidden divide-y divide-gray-50">
-            <div *ngFor="let employer of employers; let i = index" class="p-4 flex flex-col gap-3">
-
+        <div class="md:hidden divide-y divide-gray-50">
+            @for (employer of employers; track employer._id; let i = $index) {
+            <div class="p-4 flex flex-col gap-3">
                 <div class="flex items-start justify-between gap-2">
                     <div>
                         <span class="text-[11px] text-gray-400 font-bold">#{{ (pagination.page - 1) * pagination.limit +
@@ -163,11 +168,13 @@
                     </div>
                 </div>
             </div>
+            }
         </div>
+        }
 
         <!-- Pagination -->
-        <div *ngIf="!isLoading && pagination.pages > 1"
-            class="flex flex-col sm:flex-row items-center justify-between gap-3 px-4 py-3 border-t border-gray-100">
+        @if (!isLoading && pagination.pages > 1) {
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-3 px-4 py-3 border-t border-gray-100">
             <p class="text-sm text-gray-500 order-2 sm:order-1">
                 صفحة {{ pagination.page }} من {{ pagination.pages }}
             </p>
@@ -177,12 +184,13 @@
                     السابق
                 </button>
 
-                <button *ngFor="let p of getPagesArray()" (click)="goToPage(p)"
-                    [class.bg-indigo-600]="p === pagination.page" [class.text-white]="p === pagination.page"
-                    [class.border-indigo-600]="p === pagination.page"
+                @for (p of getPagesArray(); track p) {
+                <button (click)="goToPage(p)" [class.bg-indigo-600]="p === pagination.page"
+                    [class.text-white]="p === pagination.page" [class.border-indigo-600]="p === pagination.page"
                     class="px-3 py-1.5 text-sm rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition">
                     {{ p }}
                 </button>
+                }
 
                 <button (click)="goToPage(pagination.page + 1)" [disabled]="pagination.page === pagination.pages"
                     class="px-3 py-1.5 text-sm rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition">
@@ -190,5 +198,6 @@
                 </button>
             </div>
         </div>
+        }
     </div>
 </div>

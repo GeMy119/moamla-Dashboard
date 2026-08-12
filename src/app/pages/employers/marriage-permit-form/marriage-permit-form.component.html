@@ -16,31 +16,37 @@
   </div>
 
   <!-- Fetching Indicator -->
-  <div *ngIf="isFetching" class="flex items-center justify-center py-20">
+  @if (isFetching) {
+  <div class="flex items-center justify-center py-20">
     <svg class="animate-spin h-7 w-7 text-indigo-600" fill="none" viewBox="0 0 24 24">
       <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
       <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
     </svg>
   </div>
-
-  <div *ngIf="!isFetching" class="space-y-5">
+  } @else {
+  <div class="space-y-5">
 
     <!-- 🔹 قائمة اختيار الكفيل (تظهر فقط عند الفتح من الناف بار بدون ID في الرابط) -->
-    <div *ngIf="!employerIdFromUrl" class="bg-indigo-50/50 p-4 rounded-xl border border-indigo-100">
-      <label class="block text-sm font-semibold text-indigo-900 mb-1.5">اختيار الكفيل <span
-          class="text-red-500">*</span></label>
+    @if (!employerIdFromUrl) {
+    <div class="bg-indigo-50/50 p-4 rounded-xl border border-indigo-100">
+      <label class="block text-sm font-semibold text-indigo-900 mb-1.5">
+        اختيار الكفيل <span class="text-red-500">*</span>
+      </label>
       <select name="selectedEmployerId" [(ngModel)]="selectedEmployerId" (change)="onEmployerChange()" required
         class="w-full px-3 py-2.5 bg-white border border-indigo-200 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
         <option value="" disabled selected>-- اختر الكفيل من القائمة --</option>
-        <option *ngFor="let emp of employersList" [value]="emp._id">
+        @for (emp of employersList; track emp._id) {
+        <option [value]="emp._id">
           {{ emp.name }} - (هوية: {{ emp.identity_number }})
         </option>
+        }
       </select>
     </div>
+    }
 
     <!-- 🔹 بطاقة عرض بيانات الكفيل المختار -->
-    <div *ngIf="selectedEmployer"
-      class="bg-gradient-to-r from-indigo-900 to-slate-900 text-white rounded-xl shadow-sm p-5 transition-all">
+    @if (selectedEmployer) {
+    <div class="bg-gradient-to-r from-indigo-900 to-slate-900 text-white rounded-xl shadow-sm p-5 transition-all">
       <div class="flex items-center justify-between border-b border-indigo-700/50 pb-3 mb-3">
         <div class="flex items-center gap-2">
           <svg class="w-5 h-5 text-indigo-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -51,7 +57,7 @@
         </div>
         <span
           class="bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs px-2.5 py-1 rounded-full font-medium">
-          {{isEditMode? 'تعديل تصريح زواج' : 'إضافة تصريح زواج'}}
+          {{ isEditMode ? 'تعديل تصريح زواج' : 'إضافة تصريح زواج' }}
         </span>
       </div>
 
@@ -63,32 +69,27 @@
 
         <div class="bg-white/10 rounded-lg p-2 sm:p-3 min-w-0">
           <p class="text-[10px] sm:text-xs text-indigo-200 mb-1">رقم الهوية</p>
-          <p class="text-xs sm:text-sm font-medium text-white break-words">{{ selectedEmployer.identity_number
-            }}</p>
+          <p class="text-xs sm:text-sm font-medium text-white break-words">{{ selectedEmployer.identity_number }}</p>
         </div>
 
         <div class="bg-white/10 rounded-lg p-2 sm:p-3 min-w-0">
           <p class="text-[10px] sm:text-xs text-indigo-200 mb-1">رقم الصادر</p>
-          <p class="text-xs sm:text-sm font-medium text-white break-words">{{ selectedEmployer.source_number
-            }}</p>
+          <p class="text-xs sm:text-sm font-medium text-white break-words">{{ selectedEmployer.source_number }}</p>
         </div>
 
         <div class="bg-white/10 rounded-lg p-2 sm:p-3 min-w-0">
           <p class="text-[10px] sm:text-xs text-indigo-200 mb-1">رقم الملف</p>
-          <p class="text-xs sm:text-sm font-medium text-white break-words">{{ selectedEmployer.file_number }}
-          </p>
+          <p class="text-xs sm:text-sm font-medium text-white break-words">{{ selectedEmployer.file_number }}</p>
         </div>
 
         <div class="bg-white/10 rounded-lg p-2 sm:p-3 min-w-0">
           <p class="text-[10px] sm:text-xs text-indigo-200 mb-1">اسم الشركة</p>
-          <p class="text-xs sm:text-sm font-medium text-white break-words">{{ selectedEmployer.company_name }}
-          </p>
+          <p class="text-xs sm:text-sm font-medium text-white break-words">{{ selectedEmployer.company_name }}</p>
         </div>
 
         <div class="bg-white/10 rounded-lg p-2 sm:p-3 min-w-0">
           <p class="text-[10px] sm:text-xs text-indigo-200 mb-1">رقم المرجع</p>
-          <p class="text-xs sm:text-sm font-medium text-white break-words">{{
-            selectedEmployer.reference_number }}</p>
+          <p class="text-xs sm:text-sm font-medium text-white break-words">{{ selectedEmployer.reference_number }}</p>
         </div>
 
         <div class="bg-white/10 rounded-lg p-2 sm:p-3 col-span-2 lg:col-span-3 min-w-0">
@@ -97,13 +98,16 @@
         </div>
       </div>
     </div>
+    }
 
     <!-- Form Body -->
     <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
 
-      <div *ngIf="errorMessage" class="mb-5 bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg px-4 py-3">
+      @if (errorMessage) {
+      <div class="mb-5 bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg px-4 py-3">
         {{ errorMessage }}
       </div>
+      }
 
       <form (ngSubmit)="onSubmit()" class="grid grid-cols-1 md:grid-cols-2 gap-5">
 
@@ -175,10 +179,12 @@
           </button>
           <button type="submit" [disabled]="isLoading"
             class="flex items-center gap-2 px-5 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 rounded-lg transition">
-            <svg *ngIf="isLoading" class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+            @if (isLoading) {
+            <svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
             </svg>
+            }
             {{ isLoading ? 'جاري الحفظ...' : isEditMode ? 'حفظ التعديلات' : 'إضافة التصريح' }}
           </button>
         </div>
@@ -187,4 +193,6 @@
     </div>
 
   </div>
+  }
+
 </div>

@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { forkJoin } from 'rxjs';
 import { EmployerService } from '../../services/employer.service.ts.service';
 import { WorkerService } from '../../services/worker.service';
@@ -9,7 +8,7 @@ import { NationalityRequestService } from '../../services/nationality-request.se
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css',
 })

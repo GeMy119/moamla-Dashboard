@@ -12,37 +12,45 @@
         </h1>
     </div>
 
-    <div *ngIf="errorMessage" class="bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg px-4 py-3">
+    @if (errorMessage) {
+    <div class="bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg px-4 py-3">
         {{ errorMessage }}
     </div>
+    }
 
-    <div *ngIf="isFetching" class="flex items-center justify-center py-20">
+    @if (isFetching) {
+    <div class="flex items-center justify-center py-20">
         <svg class="animate-spin h-7 w-7 text-indigo-600" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
         </svg>
     </div>
+    }
 
-    <form *ngIf="!isFetching" (ngSubmit)="onSubmit()"
-        class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 space-y-6">
+    @if (!isFetching) {
+    <form (ngSubmit)="onSubmit()" class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 space-y-6">
 
         <!-- 🔹 قائمة اختيار العامل (تظهر فقط في وضع الإضافة إذا لم نكن داخل صفحة عامل معين) -->
-        <div *ngIf="!workerIdFromUrl && !isEditMode" class="bg-indigo-50/50 p-4 rounded-xl border border-indigo-100">
+        @if (!workerIdFromUrl && !isEditMode) {
+        <div class="bg-indigo-50/50 p-4 rounded-xl border border-indigo-100">
             <label class="block text-sm font-semibold text-indigo-900 mb-1">اختيار العامل <span
                     class="text-red-500">*</span></label>
             <select name="worker_id" [(ngModel)]="formData.worker_id" (change)="onWorkerChange()" required
                 class="w-full px-3 py-2.5 bg-white border border-indigo-200 rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition">
                 <option value="" disabled selected>-- اختر العامل من القائمة --</option>
-                <option *ngFor="let worker of workersList" [value]="worker._id">
+                @for (worker of workersList; track worker._id) {
+                <option [value]="worker._id">
                     {{ worker.name }} - (رقم الإقامة: {{ worker.iqama_number || worker.identity_number || 'غير متوفر'
                     }})
                 </option>
+                }
             </select>
         </div>
+        }
 
         <!-- 🔹 كارت عرض تفاصيل العامل -->
-        <div *ngIf="selectedWorker"
-            class="bg-gradient-to-r from-slate-900 to-indigo-900 text-white rounded-xl shadow-sm p-5 transition-all">
+        @if (selectedWorker) {
+        <div class="bg-gradient-to-r from-slate-900 to-indigo-900 text-white rounded-xl shadow-sm p-5 transition-all">
             <div class="flex items-center justify-between border-b border-indigo-700/50 pb-3 mb-3">
                 <div class="flex items-center gap-2">
                     <svg class="w-5 h-5 text-indigo-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -119,6 +127,7 @@
                 </div>
             </div>
         </div>
+        }
 
         <!-- 🔹 حقول نموذج التأشيرة -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -201,4 +210,5 @@
             </button>
         </div>
     </form>
+    }
 </div>
