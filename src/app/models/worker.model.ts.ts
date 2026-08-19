@@ -42,6 +42,7 @@ export interface Worker {
     iqama_expiry_date: string;
     iqama_status: string;
     iqama_issue_date: string;
+    acceptedDate: string;
     alerts?: Alert;
     profession_changes?: ProfessionChange;
     moamla_type?: MoamlaType[]
@@ -59,6 +60,7 @@ export interface CreateWorkerDto {
     iqama_expiry_date: string;
     iqama_status: string;
     iqama_issue_date: string;
+    acceptedDate: string;
 }
 
 export interface WorkerResponse {

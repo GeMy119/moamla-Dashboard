@@ -35,6 +35,7 @@ export class WorkerFormComponent implements OnInit {
     iqama_expiry_date: '',
     iqama_status: '',
     iqama_issue_date: '',
+    acceptedDate: ''
   };
 
   constructor(
@@ -113,6 +114,7 @@ export class WorkerFormComponent implements OnInit {
           iqama_expiry_date: w.iqama_expiry_date,
           iqama_status: w.iqama_status,
           iqama_issue_date: w.iqama_issue_date,
+          acceptedDate: w.acceptedDate,
         };
 
         // جلب تفاصيل الكفيل للعامل المطلوب تعديله
